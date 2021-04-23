@@ -13,7 +13,7 @@
         ['Commercial associate', 'Working', 'State servant', 'Pensioner', 'Student']
 + edu_type: 교육 수준
 
-        ['Higher education' ,'Secondary / secondary special', 'Incomplete higher', 'Lower secondary', 'Academic degree']
+        ['Higher education', 'Secondary / secondary special', 'Incomplete higher', 'Lower secondary', 'Academic degree']
 
 + family_type: 결혼 여부
 
@@ -65,3 +65,6 @@
 ### 모델
 + LightGBM
 + CatBoost
+
+## Cross Validation 전략
+- Stratified K-Fold

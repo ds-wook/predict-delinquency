@@ -25,6 +25,8 @@ def objective(trial: Trial) -> float:
         "verbosity": -1,
         "learning_rate": 0.05,
         "n_estimators": 10000,
+        # "objective": "multiclass",
+        # "metric": "multi_logloss",
         "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 3e-5),
         "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 9e-2),
         "max_depth": trial.suggest_int("max_depth", 1, 20),
@@ -81,4 +83,6 @@ if __name__ == "__main__":
     params["boosting_type"] = "gbdt"
     params["learning_rate"] = 0.05
     params["n_estimators"] = 10000
+    # params["objective"] = "multiclass"
+    # params["metric"] = "multi_logloss"
     joblib.dump(params, "../../parameters/" + args.params)
