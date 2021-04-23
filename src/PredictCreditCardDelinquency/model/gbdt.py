@@ -17,8 +17,8 @@ def stratified_kfold_lgbm(
 
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
-    lgb_oof = np.zeros(X.shape[0])
-    lgb_preds = np.zeros(X_test.shape[0])
+    lgb_oof = np.zeros((X.shape[0], 3))
+    lgb_preds = np.zeros((X_test.shape[0], 3))
 
     for fold, (train_idx, valid_idx) in enumerate(splits):
         print(f"============ Fold {fold} ============")

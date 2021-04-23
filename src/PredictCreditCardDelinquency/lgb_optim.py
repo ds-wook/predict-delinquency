@@ -51,7 +51,7 @@ def objective(trial: Trial) -> float:
             y_train,
             eval_set=[(X_train, y_train), (X_valid, y_valid)],
             early_stopping_rounds=100,
-            verbose=10,
+            verbose=False,
         )
 
         lgb_oof[valid_idx] = model.predict_proba(X_valid)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     args = parse.parse_args()
     study = optuna.create_study(
         study_name="lgbm_parameter_opt",
-        direction="maximize",
+        direction="minimize",
         sampler=TPESampler(seed=42),
     )
     study.optimize(objective, n_trials=args.trials)
