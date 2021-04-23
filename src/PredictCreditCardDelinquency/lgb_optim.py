@@ -51,7 +51,7 @@ def objective(trial: Trial) -> float:
             y_train,
             eval_set=[(X_train, y_train), (X_valid, y_valid)],
             early_stopping_rounds=100,
-            verbose=False,
+            verbose=10,
         )
 
         lgb_oof[valid_idx] = model.predict_proba(X_valid)
