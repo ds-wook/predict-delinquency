@@ -1,6 +1,25 @@
 from typing import Tuple
 
+import numpy as np
 import pandas as pd
+
+
+def remove_outlier(data: pd.DataFrame, column: str) -> pd.DataFrame:
+    df = data[column]
+    # 1분위수
+    quan_25 = np.percentile(df.values, 25)
+
+    # 3분위수
+    quan_75 = np.percentile(df.values, 75)
+
+    iqr = quan_75 - quan_25
+
+    lowest = quan_25 - iqr * 1.5
+    highest = quan_75 + iqr * 1.5
+    outlier_index = df[(df < lowest) | (df > highest)].index
+    data.drop(outlier_index, axis=0, inplace=True)
+
+    return data
 
 
 def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -14,7 +33,19 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test = test.drop(["index"], axis=1)
     test.fillna("NAN", inplace=True)
 
+    negative_col = ["DAYS_BIRTH", "DAYS_EMPLOYED", "begin_month"]
+    for col in negative_col:
+        train[col] *= -1
+        test[col] *= -1
+
+    # pseudo_label = pd.read_csv("../../res/pseudo_lgbm.csv")
+
+    # test["credit"] = [x for x in pseudo_label.credit]
+    # train = pd.concat([train, test], axis=0)
+
     train_ohe = pd.get_dummies(train)
     test_ohe = pd.get_dummies(test)
+
+    # test_ohe.drop(["credit"], axis=1, inplace=True)
 
     return train_ohe, test_ohe

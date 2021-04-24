@@ -130,3 +130,5 @@ dmypy.json
 .vscode/
 input/
 submission/
+res/
+catboost_info/

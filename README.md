@@ -64,7 +64,6 @@
 
 ### 모델
 + LightGBM
-+ CatBoost
 
 ## Cross Validation 전략
-- Stratified K-Fold
++ Stratified K-Fold

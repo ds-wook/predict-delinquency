@@ -23,9 +23,10 @@ if __name__ == "__main__":
     args = parse.parse_args()
 
     lgb_params = pd.read_pickle("../../parameters/lgbm_params.pkl")
+    # cat_params = pd.read_pickle("../../parameters/best_cat_params.pkl")
 
     lgb_preds = stratified_kfold_lgbm(lgb_params, args.fold, X, y, X_test)
-
+    # cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = lgb_preds
     submission.to_csv(args.path + args.file, index=False)
