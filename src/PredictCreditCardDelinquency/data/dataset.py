@@ -33,10 +33,55 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test = test.drop(["index"], axis=1)
     test.fillna("NAN", inplace=True)
 
-    negative_col = ["DAYS_BIRTH", "DAYS_EMPLOYED", "begin_month"]
-    for col in negative_col:
-        train[col] *= -1
-        test[col] *= -1
+    # DAYS_BIRTH
+    train["DAYS_BIRTH_month"] = np.floor((-train["DAYS_BIRTH"]) / 30) - (
+        (np.floor((-train["DAYS_BIRTH"]) / 30) / 12).astype(int) * 12
+    )
+    train["DAYS_BIRTH_week"] = np.floor((-train["DAYS_BIRTH"]) / 7) - (
+        (np.floor((-train["DAYS_BIRTH"]) / 7) / 4).astype(int) * 4
+    )
+
+    # DAYS_EMPLOYED
+    train["DAYS_EMPLOYED_month"] = np.floor((-train["DAYS_EMPLOYED"]) / 30) - (
+        (np.floor((-train["DAYS_EMPLOYED"]) / 30) / 12).astype(int) * 12
+    )
+    train["DAYS_EMPLOYED_week"] = np.floor((-train["DAYS_EMPLOYED"]) / 7) - (
+        (np.floor((-train["DAYS_EMPLOYED"]) / 7) / 4).astype(int) * 4
+    )
+
+    # before_EMPLOYED
+    train["before_EMPLOYED"] = train["DAYS_BIRTH"] - train["DAYS_EMPLOYED"]
+    train["before_EMPLOYED_month"] = np.floor((-train["before_EMPLOYED"]) / 30) - (
+        (np.floor((-train["before_EMPLOYED"]) / 30) / 12).astype(int) * 12
+    )
+    train["before_EMPLOYED_week"] = np.floor((-train["before_EMPLOYED"]) / 7) - (
+        (np.floor((-train["before_EMPLOYED"]) / 7) / 4).astype(int) * 4
+    )
+
+    # DAYS_BIRTH
+    test["DAYS_BIRTH_month"] = np.floor((-test["DAYS_BIRTH"]) / 30) - (
+        (np.floor((-test["DAYS_BIRTH"]) / 30) / 12).astype(int) * 12
+    )
+    test["DAYS_BIRTH_week"] = np.floor((-test["DAYS_BIRTH"]) / 7) - (
+        (np.floor((-test["DAYS_BIRTH"]) / 7) / 4).astype(int) * 4
+    )
+
+    # DAYS_EMPLOYED
+    test["DAYS_EMPLOYED_month"] = np.floor((-test["DAYS_EMPLOYED"]) / 30) - (
+        (np.floor((-test["DAYS_EMPLOYED"]) / 30) / 12).astype(int) * 12
+    )
+    test["DAYS_EMPLOYED_week"] = np.floor((-test["DAYS_EMPLOYED"]) / 7) - (
+        (np.floor((-test["DAYS_EMPLOYED"]) / 7) / 4).astype(int) * 4
+    )
+
+    # before_EMPLOYED
+    test["before_EMPLOYED"] = test["DAYS_BIRTH"] - test["DAYS_EMPLOYED"]
+    test["before_EMPLOYED_month"] = np.floor((-test["before_EMPLOYED"]) / 30) - (
+        (np.floor((-test["before_EMPLOYED"]) / 30) / 12).astype(int) * 12
+    )
+    test["before_EMPLOYED_week"] = np.floor((-test["before_EMPLOYED"]) / 7) - (
+        (np.floor((-test["before_EMPLOYED"]) / 7) / 4).astype(int) * 4
+    )
 
     # pseudo_label = pd.read_csv("../../res/pseudo_lgbm.csv")
 

@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
-    lgb_params = pd.read_pickle("../../parameters/lgbm_params.pkl")
+    lgb_params = pd.read_pickle("../../parameters/best_lgbm_params.pkl")
     # cat_params = pd.read_pickle("../../parameters/best_cat_params.pkl")
 
     lgb_preds = stratified_kfold_lgbm(lgb_params, args.fold, X, y, X_test)
