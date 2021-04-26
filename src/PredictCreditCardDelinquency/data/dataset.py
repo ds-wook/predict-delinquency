@@ -4,24 +4,6 @@ import numpy as np
 import pandas as pd
 
 
-def remove_outlier(data: pd.DataFrame, column: str) -> pd.DataFrame:
-    df = data[column]
-    # 1분위수
-    quan_25 = np.percentile(df.values, 25)
-
-    # 3분위수
-    quan_75 = np.percentile(df.values, 75)
-
-    iqr = quan_75 - quan_25
-
-    lowest = quan_25 - iqr * 1.5
-    highest = quan_75 + iqr * 1.5
-    outlier_index = df[(df < lowest) | (df > highest)].index
-    data.drop(outlier_index, axis=0, inplace=True)
-
-    return data
-
-
 def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     path = "../../input/predict-credit-card-delinquency/"
 
@@ -33,6 +15,8 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test = test.drop(["index"], axis=1)
     test.fillna("NAN", inplace=True)
 
+    train = train.drop(["child_num"], axis=1)
+    test = test.drop(["child_num"], axis=1)
     # DAYS_BIRTH
     train["DAYS_BIRTH_month"] = np.floor((-train["DAYS_BIRTH"]) / 30) - (
         (np.floor((-train["DAYS_BIRTH"]) / 30) / 12).astype(int) * 12
