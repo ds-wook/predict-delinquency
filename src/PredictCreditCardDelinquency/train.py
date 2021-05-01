@@ -3,13 +3,12 @@ import argparse
 import pandas as pd
 
 from data.dataset import load_dataset
-from model.gbdt import stratified_kfold_lgbm
+from model.gbdt import stratified_kfold_cat, stratified_kfold_lgbm
 
-train_ohe, test_ohe = load_dataset()
-
-X = train_ohe.drop("credit", axis=1)
-y = train_ohe["credit"]
-X_test = test_ohe.copy()
+train, test = load_dataset()
+X = train.drop("credit", axis=1)
+y = train["credit"]
+X_test = test.copy()
 
 
 if __name__ == "__main__":
@@ -22,9 +21,41 @@ if __name__ == "__main__":
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
-    lgb_params = pd.read_pickle("../../parameters/best_lgbm_params.pkl")
-    # cat_params = pd.read_pickle("../../parameters/best_cat_params.pkl")
-
+    lgb_params = pd.read_pickle("../../parameters/pre_lgbm_params.pkl")
+    # cat_params = {
+    #     "l2_leaf_reg": 0.08415589927862066,
+    #     "max_depth": 10,
+    #     "bagging_temperature": 1,
+    #     "min_data_in_leaf": 72,
+    #     "max_bin": 364,
+    #     "random_state": 2021,
+    #     "eval_metric": "MultiClass",
+    #     "loss_function": "MultiClass",
+    #     "learning_rate": 0.01,
+    #     "od_type": "Iter",
+    #     "od_wait": 500,
+    #     "n_estimators": 10000,
+    #     "cat_features": [
+    #         "gender",
+    #         "car",
+    #         "reality",
+    #         "income_type",
+    #         "edu_type",
+    #         "family_type",
+    #         "house_type",
+    #         "occyp_type",
+    #         "gender_car_reality",
+    #         "gender_mean_target",
+    #         "car_mean_target",
+    #         "reality_mean_target",
+    #         "income_type_mean_target",
+    #         "edu_type_mean_target",
+    #         "family_type_mean_target",
+    #         "house_type_mean_target",
+    #         "occyp_type_mean_target",
+    #         "gender_car_reality_mean_target",
+    #     ],
+    # }
     lgb_preds = stratified_kfold_lgbm(lgb_params, args.fold, X, y, X_test)
     # cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)
     submission = pd.read_csv(path + "sample_submission.csv")

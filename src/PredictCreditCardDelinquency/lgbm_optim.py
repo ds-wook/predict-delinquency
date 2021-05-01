@@ -38,17 +38,16 @@ def objective(trial: Trial) -> float:
     }
     folds = StratifiedKFold(n_splits=args.fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
-    scores = []
+
     lgb_oof = np.zeros((X.shape[0], 3))
     lgb_preds = np.zeros((X_test.shape[0], 3))
 
     for fold, (train_idx, valid_idx) in enumerate(splits):
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
+        pre_model = LGBMClassifier(**params_lgb)
 
-        model = LGBMClassifier(**params_lgb)
-
-        model.fit(
+        pre_model.fit(
             X_train,
             y_train,
             eval_set=[(X_train, y_train), (X_valid, y_valid)],
@@ -56,12 +55,24 @@ def objective(trial: Trial) -> float:
             verbose=False,
         )
 
+        params_lgb2 = params_lgb.copy()
+        params_lgb2["learning_rate"] = params_lgb["learning_rate"] * 0.1
+
+        model = LGBMClassifier(**params_lgb2)
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_train, y_train), (X_valid, y_valid)],
+            early_stopping_rounds=100,
+            verbose=False,
+            init_model=pre_model,
+        )
+
         lgb_oof[valid_idx] = model.predict_proba(X_valid)
         lgb_preds += model.predict_proba(X_test) / args.fold
 
     log_score = log_loss(y, lgb_oof)
-    scores.append(log_score)
-    return np.mean(scores)
+    return log_score
 
 
 if __name__ == "__main__":
@@ -70,10 +81,11 @@ if __name__ == "__main__":
     parse.add_argument("--trials", type=int, default=360)
     parse.add_argument("--params", type=str, default="params.pkl")
     args = parse.parse_args()
+    sampler = TPESampler(seed=42)
     study = optuna.create_study(
         study_name="lgbm_parameter_opt",
         direction="minimize",
-        sampler=TPESampler(seed=42),
+        sampler=sampler,
     )
     study.optimize(objective, n_trials=args.trials)
     print("Best Score:", study.best_value)

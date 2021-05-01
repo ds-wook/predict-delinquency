@@ -77,12 +77,23 @@ if __name__ == "__main__":
     print("Best Score:", study.best_value)
     print("Best trial:", study.best_trial.params)
     params = study.best_trial.params
-    params["random_state"] = 2021
+    params["random_state"] = 42
     params["eval_metric"] = "MultiClass"
     params["loss_function"] = "MultiClass"
     params["learning_rate"] = 0.01
     params["od_type"] = "Iter"
     params["od_wait"] = 500
     params["n_estimators"] = 10000
-    params["cat_features"] = [col for col in X.columns if X[col].dtype == "uint8"]
+    params["cat_features"] = [
+        "gender",
+        "car",
+        "reality",
+        "income_type",
+        "edu_type",
+        "family_type",
+        "house_type",
+        "occyp_type",
+        "gender_car",
+        "gender_car_reality",
+    ]
     joblib.dump(params, "../../parameters/" + args.params)
