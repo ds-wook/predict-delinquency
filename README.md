@@ -61,6 +61,7 @@
 
 
 		=> 낮을 수록 높은 신용의 신용카드 사용자를 의미함
+### Feature Engineering
 
 ### 모델
 + LightGBM
