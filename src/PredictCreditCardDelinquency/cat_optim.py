@@ -1,13 +1,12 @@
 import argparse
 
 import joblib
-import numpy as np
 import optuna
 from catboost import CatBoostClassifier
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.metrics import log_loss
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import train_test_split
 
 from data.dataset import load_dataset
 
@@ -34,32 +33,21 @@ def objective(trial: Trial) -> float:
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 5, 100),
         "max_bin": trial.suggest_int("max_bin", 200, 500),
     }
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2)
 
-    folds = StratifiedKFold(n_splits=args.fold, shuffle=True, random_state=42)
-    splits = folds.split(X, y)
-    scores = []
-    cat_oof = np.zeros((X.shape[0], 3))
-    cat_preds = np.zeros((X_test.shape[0], 3))
+    model = CatBoostClassifier(**params_cat)
+    model.fit(
+        X_train,
+        y_train,
+        eval_set=[(X_train, y_train), (X_valid, y_valid)],
+        use_best_model=True,
+        early_stopping_rounds=100,
+        verbose=False,
+    )
+    cat_preds = model.predict_proba(X_valid)
+    log_score = log_loss(y_valid, cat_preds)
 
-    for fold, (train_idx, valid_idx) in enumerate(splits):
-        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
-        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
-
-        model = CatBoostClassifier(**params_cat)
-        model.fit(
-            X_train,
-            y_train,
-            eval_set=[(X_train, y_train), (X_valid, y_valid)],
-            use_best_model=True,
-            early_stopping_rounds=100,
-            verbose=False,
-        )
-        cat_oof[valid_idx] = model.predict_proba(X_valid)
-        cat_preds += model.predict_proba(X_test) / args.fold
-
-    log_score = log_loss(y, cat_oof)
-    scores.append(log_score)
-    return np.mean(scores)
+    return log_score
 
 
 if __name__ == "__main__":
@@ -85,9 +73,6 @@ if __name__ == "__main__":
     params["od_wait"] = 500
     params["n_estimators"] = 10000
     params["cat_features"] = [
-        "gender",
-        "car",
-        "reality",
         "income_type",
         "edu_type",
         "family_type",

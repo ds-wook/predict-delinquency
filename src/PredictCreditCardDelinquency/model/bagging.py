@@ -1,6 +1,5 @@
 from typing import Dict
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -29,17 +28,12 @@ def stratified_kfold_rf(
         model.fit(
             X_train,
             y_train,
-            eval_set=[(X_train, y_train), (X_valid, y_valid)],
-            early_stopping_rounds=100,
-            verbose=100,
         )
 
         rf_oof[valid_idx] = model.predict_proba(X_valid)
         rf_preds += model.predict_proba(X_test) / n_fold
+        print(f"Log Loss Score: {log_loss(y_valid, rf_oof[valid_idx]):.5f}")
 
-    fig, ax = plt.subplots(figsize=(20, 14))
-
-    plt.savefig("../../graph/lgbm_import.png")
     log_score = log_loss(y, rf_oof)
     print(f"Log Loss Score: {log_score:.5f}")
 

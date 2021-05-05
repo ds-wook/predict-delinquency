@@ -50,7 +50,6 @@ def stratified_kfold_lgbm(
             verbose=100,
             init_model=pre_model,
         )
-
         lgb_oof[valid_idx] = model.predict_proba(X_valid)
         lgb_preds += model.predict_proba(X_test) / n_fold
 

@@ -6,7 +6,7 @@ import optuna
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.metrics import log_loss
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from xgboost import XGBClassifier
 
 from data.dataset import load_dataset
@@ -34,29 +34,20 @@ def objective(trial: Trial) -> float:
         "min_child_weight": trial.suggest_int("min_child_weight", 5, 100),
         "gamma": trial.suggest_float("gamma", 0.5, 1),
     }
-    folds = StratifiedKFold(n_splits=args.fold, shuffle=True, random_state=42)
-    splits = folds.split(X, y)
 
-    xgb_oof = np.zeros((X.shape[0], 3))
-    xgb_preds = np.zeros((X_test.shape[0], 3))
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2)
+    model = XGBClassifier(**params_lgb)
+    model.fit(
+        X_train,
+        y_train,
+        eval_set=[(X_train, y_train), (X_valid, y_valid)],
+        early_stopping_rounds=100,
+        verbose=False,
+    )
 
-    for fold, (train_idx, valid_idx) in enumerate(splits):
-        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
-        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
-        model = XGBClassifier(**params_lgb)
+    xgb_pred = model.predict_proba(X_valid)
+    log_score = log_loss(y, xgb_pred)
 
-        model.fit(
-            X_train,
-            y_train,
-            eval_set=[(X_train, y_train), (X_valid, y_valid)],
-            early_stopping_rounds=100,
-            verbose=False,
-        )
-
-        xgb_oof[valid_idx] = model.predict_proba(X_valid)
-        xgb_preds += model.predict_proba(X_test) / args.fold
-
-    log_score = log_loss(y, xgb_oof)
     return log_score
 
 
@@ -66,6 +57,7 @@ if __name__ == "__main__":
     parse.add_argument("--trials", type=int, default=360)
     parse.add_argument("--params", type=str, default="params.pkl")
     args = parse.parse_args()
+
     sampler = TPESampler(seed=42)
     study = optuna.create_study(
         study_name="xgb_parameter_opt",
@@ -73,8 +65,10 @@ if __name__ == "__main__":
         sampler=sampler,
     )
     study.optimize(objective, n_trials=args.trials)
+
     print("Best Score:", study.best_value)
     print("Best trial:", study.best_trial.params)
+
     params = study.best_trial.params
     params["random_state"] = 42
     params["n_estimators"] = 10000

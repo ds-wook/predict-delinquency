@@ -17,13 +17,19 @@ if __name__ == "__main__":
     parse.add_argument(
         "--path", type=str, help="Input data save path", default="../../submission/"
     )
-    parse.add_argument("--file", type=str, help="Input file name", default="model.csv")
+    parse.add_argument("--file", type=str, help="Input file name", default="submit.csv")
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
     rf_params = {
+        "criterion": "gini",
         "n_estimators": 10000,
-        
+        "min_samples_split": 10,
+        "min_samples_leaf": 1,
+        "max_features": "auto",
+        "oob_score": True,
+        "random_state": 42,
+        "n_jobs": -1
     }
     rf_preds = stratified_kfold_rf(rf_params, args.fold, X, y, X_test)
 
