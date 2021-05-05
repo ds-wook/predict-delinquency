@@ -105,9 +105,9 @@ test["gender_car_reality"] = (
     + test["reality"].astype(str)
 )
 
-# # income_total_log
-# train["income_total_log"] = np.log1p(train["income_total"])
-# test["income_total_log"] = np.log1p(test["income_total"])
+# income_total_log
+train["income_total_log"] = np.log1p(train["income_total"])
+test["income_total_log"] = np.log1p(test["income_total"])
 
 del_cols = [
     "email",
@@ -174,4 +174,8 @@ train.info()
 train["before_EMPLOYED"]
 # %%
 train["DAYS_EMPLOYED_week"].head()
+# %%
+fig, ax = plt.subplots(figsize=(18, 15))
+sns.heatmap(train.corr())
+plt.show()
 # %%

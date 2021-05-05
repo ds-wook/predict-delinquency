@@ -3,8 +3,9 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from category_encoders.ordinal import OrdinalEncoder
+from category_encoders.target_encoder import TargetEncoder
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import LabelEncoder
 
 warnings.filterwarnings("ignore")
 
@@ -100,9 +101,44 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
         + test["reality"].astype(str)
     )
 
-    # # income_total_log
-    # train["income_total_log"] = np.log1p(train["income_total"])
-    # test["income_total_log"] = np.log1p(test["income_total"])
+    # identity
+    train["identity"] = (
+        train["gender"].astype(str)
+        + train["income_total"].astype(str)
+        + train["income_type"].astype(str)
+        + train["DAYS_BIRTH"].astype(str)
+        + train["DAYS_EMPLOYED"].astype(str)
+    )
+    test["identity"] = (
+        test["gender"].astype(str)
+        + test["income_total"].astype(str)
+        + test["income_type"].astype(str)
+        + test["DAYS_BIRTH"].astype(str)
+        + test["DAYS_EMPLOYED"].astype(str)
+    )
+
+    cat_cols = [
+        "email",
+        "gender",
+        "car",
+        "reality",
+        "income_type",
+        "edu_type",
+        "family_type",
+        "house_type",
+        "occyp_type",
+        "gender_car_reality",
+        "identity",
+    ]
+
+    le_encoder = OrdinalEncoder(cat_cols)
+    train[cat_cols] = le_encoder.fit_transform(train[cat_cols], train["credit"])
+    test[cat_cols] = le_encoder.transform(test[cat_cols])
+
+    # kmeans_train = train.drop(["credit"], axis=1)
+    # kmeans = KMeans(n_clusters=35, random_state=42).fit(kmeans_train)
+    # train["kmeans_clusters"] = kmeans.predict(kmeans_train)
+    # test["kmeans_clusters"] = kmeans.predict(test)
 
     del_cols = [
         "email",
@@ -117,24 +153,4 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     train.drop(train.loc[train["family_size"] > 7, "family_size"].index, inplace=True)
     train.drop(del_cols, axis=1, inplace=True)
     test.drop(del_cols, axis=1, inplace=True)
-
-    cat_cols = [
-        "income_type",
-        "edu_type",
-        "family_type",
-        "house_type",
-        "occyp_type",
-        "gender_car_reality",
-    ]
-
-    for col in cat_cols:
-        label_encoder = LabelEncoder()
-        label_encoder = label_encoder.fit(train[col])
-        train[col] = label_encoder.transform(train[col])
-        test[col] = label_encoder.transform(test[col])
-
-    kmeans_train = train.drop(["credit"], axis=1)
-    kmeans = KMeans(n_clusters=36, random_state=42).fit(kmeans_train)
-    train["kmeans_clusters"] = kmeans.predict(kmeans_train)
-    test["kmeans_clusters"] = kmeans.predict(test)
     return train, test
