@@ -1,10 +1,10 @@
 from typing import Dict
 
+import lightgbm as lgbm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-import lightgbm as lgbm
 from catboost import CatBoostClassifier, Pool
 from lightgbm import LGBMClassifier
 from sklearn.metrics import log_loss
@@ -74,14 +74,7 @@ def stratified_kfold_cat(
     splits = folds.split(X, y)
     cat_oof = np.zeros((X.shape[0], 3))
     cat_preds = np.zeros((X_test.shape[0], 3))
-    cat_cols = [
-        "income_type",
-        "edu_type",
-        "family_type",
-        "house_type",
-        "occyp_type",
-        "gender_car_reality",
-    ]
+    cat_cols = [c for c in X.columns if X[c].dtypes == "int64"]
 
     for fold, (train_idx, valid_idx) in enumerate(splits):
         print(f"============ Fold {fold} ============\n")

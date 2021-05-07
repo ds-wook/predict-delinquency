@@ -5,10 +5,10 @@ import pandas as pd
 if __name__ == "__main__":
     path = "../../input/predict-credit-card-delinquency/"
     parse = argparse.ArgumentParser("Ensemble")
-    parse.add_argument("--w1", type=float, default=0.5)
+    parse.add_argument("--w1", type=float, default=0.55)
     parse.add_argument("--w2", type=float, default=0.2)
     parse.add_argument("--w3", type=float, default=0.05)
-    parse.add_argument("--w4", type=float, default=0.4)
+    parse.add_argument("--w4", type=float, default=0.2)
     parse.add_argument("--file", type=str, default="ensemble_model.csv")
     args = parse.parse_args()
 

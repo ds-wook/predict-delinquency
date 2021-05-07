@@ -34,14 +34,7 @@ if __name__ == "__main__":
         "od_type": "Iter",
         "od_wait": 500,
         "n_estimators": 10000,
-        "cat_features": [
-            "income_type",
-            "edu_type",
-            "family_type",
-            "house_type",
-            "occyp_type",
-            "gender_car_reality",
-        ],
+        "cat_features": [c for c in X.columns if X[c].dtypes == "int64"]
     }
 
     cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)

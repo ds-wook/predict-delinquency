@@ -22,7 +22,6 @@ test = pd.read_csv(path + "test.csv")
 test = test.drop(["index"], axis=1)
 test.fillna("NAN", inplace=True)
 
-# %%
 # absolute
 train["DAYS_EMPLOYED"] = train["DAYS_EMPLOYED"].map(lambda x: 0 if x > 0 else x)
 train["DAYS_EMPLOYED"] = np.abs(train["DAYS_EMPLOYED"])
@@ -146,8 +145,9 @@ test["kmeans_clusters"] = kmeans.predict(test)
 # %%
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
-kmeans_train = scaler.fit_transform(kmeans_train)
+kmeans_train = scaler.fit_transform(train["begin_month"])
 
 pca = PCA(n_components=2)
 principal_comp = pca.fit_transform(kmeans_train)
@@ -178,4 +178,46 @@ train["DAYS_EMPLOYED_week"].head()
 fig, ax = plt.subplots(figsize=(18, 15))
 sns.heatmap(train.corr())
 plt.show()
+# %%
+train.groupby(["identity"])["credit"].agg("count")
+# %%
+print(train.groupby(["identity"]).agg("count").to_dict().get("income_total"))
+
+# %%
+sns.histplot(train["begin_month"])
+# %%
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+kmeans_train = scaler.fit_transform(-train["begin_month"].values.reshape(-1, 1))
+# %%
+sns.histplot(kmeans_train)
+# %%
+train["DAYS_BIRTH"] = np.abs(train["DAYS_BIRTH"])
+train["DAYS_BIRTH"]
+# %%
+sns.histplot(train["DAYS_BIRTH"])
+# %%
+sns.countplot(train["DAYS_BIRTH_week"])
+# %%
+sns.violinplot(train["before_EMPLOYED"])
+
+# %%
+sns.countplot(train["EMPLOYED"])
+# %%
+train.skew()
+# %%
+def elbow(data):
+    sse = []
+    for i in range(2, 50):
+        km = KMeans(n_clusters=i)
+        km.fit(data)
+        sse.append(km.inertia_)
+    plt.plot(range(2, 50), sse, marker="o")
+    plt.xlabel("클러스터 개수")
+    plt.ylabel("SSE")
+    plt.show()
+
+
+elbow(kmeans_train)
 # %%
