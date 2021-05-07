@@ -3,9 +3,10 @@ from typing import Dict
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from catboost import CatBoostClassifier, Pool
 from lightgbm import LGBMClassifier, plot_importance
 from sklearn.metrics import log_loss
-from sklearn.model_selection import GroupKFold, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold
 
 
 def stratified_kfold_lgbm(
@@ -59,38 +60,40 @@ def stratified_kfold_lgbm(
     return lgb_preds
 
 
-def group_kfold_lgbm(
+def stratified_kfold_cat(
     params: Dict[str, int],
     n_fold: int,
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
-    group: pd.Series,
 ) -> np.ndarray:
 
-    folds = GroupKFold(n_splits=n_fold)
-    splits = folds.split(X, y, groups=group)
-    lgb_oof = np.zeros((X.shape[0], 3))
-    lgb_preds = np.zeros((X_test.shape[0], 3))
+    folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
+    splits = folds.split(X, y)
+    cat_oof = np.zeros((X.shape[0], 3))
+    cat_preds = np.zeros((X_test.shape[0], 3))
+    cat_cols = [c for c in X.columns if X[c].dtypes == "int64"]
 
     for fold, (train_idx, valid_idx) in enumerate(splits):
-        print(f"============ Fold {fold} ============")
+        print(f"============ Fold {fold} ============\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
+        train_data = Pool(data=X_train, label=y_train, cat_features=cat_cols)
+        valid_data = Pool(data=X_valid, label=y_valid, cat_features=cat_cols)
 
-        model = LGBMClassifier(**params)
+        model = CatBoostClassifier(**params)
 
         model.fit(
-            X_train,
-            y_train,
-            eval_set=[(X_train, y_train), (X_valid, y_valid)],
+            train_data,
+            eval_set=valid_data,
             early_stopping_rounds=100,
+            use_best_model=True,
             verbose=100,
         )
 
-        lgb_oof[valid_idx] = model.predict_proba(X_valid)
-        lgb_preds += model.predict_proba(X_test) / n_fold
+        cat_oof[valid_idx] = model.predict_proba(X_valid)
+        cat_preds += model.predict_proba(X_test) / n_fold
 
-    log_score = log_loss(y, lgb_oof)
-    print(f"Score: {log_score}")
-    return lgb_preds
+    log_score = log_loss(y, cat_oof)
+    print(f"Log Loss Score: {log_score:.5f}\n")
+    return cat_preds
