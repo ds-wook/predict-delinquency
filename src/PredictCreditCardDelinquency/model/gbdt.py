@@ -19,7 +19,6 @@ def stratified_kfold_lgbm(
     y: pd.DataFrame,
     X_test: pd.DataFrame,
 ) -> np.ndarray:
-
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     lgb_oof = np.zeros((X.shape[0], 3))
@@ -69,7 +68,6 @@ def stratified_kfold_cat(
     y: pd.DataFrame,
     X_test: pd.DataFrame,
 ) -> np.ndarray:
-
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     cat_oof = np.zeros((X.shape[0], 3))

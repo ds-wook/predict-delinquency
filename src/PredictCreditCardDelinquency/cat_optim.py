@@ -1,58 +1,70 @@
 import argparse
 
 import joblib
+import numpy as np
 import optuna
-from catboost import CatBoostClassifier
+from catboost import CatBoostClassifier, Pool
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.metrics import log_loss
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
 
 from data.dataset import load_dataset
 
-train_ohe, test_ohe = load_dataset()
+train, test = load_dataset()
 
-X = train_ohe.drop("credit", axis=1)
-y = train_ohe["credit"]
-X_test = test_ohe.copy()
+X = train.drop("credit", axis=1)
+y = train["credit"]
+cat_cols = [c for c in X.columns if X[c].dtypes == "int64"]
+X_test = test.copy()
 
 
 def objective(trial: Trial) -> float:
+    folds = StratifiedKFold(n_splits=args.fold, shuffle=True, random_state=42)
+    splits = folds.split(X, y)
+    cat_oof = np.zeros((X.shape[0], 3))
     params_cat = {
         "loss_function": "MultiClass",
         "eval_metric": "MultiClass",
         "od_type": "Iter",
         "od_wait": 500,
-        "random_seed": 2021,
-        "learning_rate": 0.01,
+        "random_seed": 42,
         "iterations": 10000,
-        "cat_features": [col for col in X.columns if X[col].dtype == "uint8"],
-        "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 0.01, 1),
+        "cat_features": cat_cols,
+        "learning_rate": trial.suggest_uniform("learning_rate", 1e-5, 1.0),
+        "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1e-1, 1.0, log=True),
         "max_depth": trial.suggest_int("max_depth", 4, 10),
         "bagging_temperature": trial.suggest_int("bagging_temperature", 1, 10),
         "min_data_in_leaf": trial.suggest_int("min_data_in_leaf", 5, 100),
         "max_bin": trial.suggest_int("max_bin", 200, 500),
     }
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2)
 
-    model = CatBoostClassifier(**params_cat)
-    model.fit(
-        X_train,
-        y_train,
-        eval_set=[(X_train, y_train), (X_valid, y_valid)],
-        use_best_model=True,
-        early_stopping_rounds=100,
-        verbose=False,
-    )
-    cat_preds = model.predict_proba(X_valid)
-    log_score = log_loss(y_valid, cat_preds)
+    for fold, (train_idx, valid_idx) in enumerate(splits):
+        print(f"============ Fold {fold} ============\n")
+        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
+        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
 
+        train_data = Pool(data=X_train, label=y_train, cat_features=cat_cols)
+        valid_data = Pool(data=X_valid, label=y_valid, cat_features=cat_cols)
+
+        model = CatBoostClassifier(**params_cat)
+        model.fit(
+            train_data,
+            eval_set=valid_data,
+            early_stopping_rounds=100,
+            use_best_model=True,
+            verbose=100,
+        )
+
+        cat_oof[valid_idx] = model.predict_proba(X_valid)
+
+    log_score = log_loss(y, cat_oof)
     return log_score
 
 
 if __name__ == "__main__":
     parse = argparse.ArgumentParser("Optimize")
-    parse.add_argument("--fold", type=int, default=5)
+    parse.add_argument("--fold", type=int, default=10)
     parse.add_argument("--trials", type=int, default=360)
     parse.add_argument("--params", type=str, default="params.pkl")
     args = parse.parse_args()
@@ -68,17 +80,8 @@ if __name__ == "__main__":
     params["random_state"] = 42
     params["eval_metric"] = "MultiClass"
     params["loss_function"] = "MultiClass"
-    params["learning_rate"] = 0.01
     params["od_type"] = "Iter"
     params["od_wait"] = 500
-    params["n_estimators"] = 10000
-    params["cat_features"] = [
-        "income_type",
-        "edu_type",
-        "family_type",
-        "house_type",
-        "occyp_type",
-        "gender_car",
-        "gender_car_reality",
-    ]
+    params["iterations"] = 10000
+    params["cat_features"] = cat_cols
     joblib.dump(params, "../../parameters/" + args.params)

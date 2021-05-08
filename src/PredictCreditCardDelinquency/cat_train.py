@@ -36,7 +36,6 @@ if __name__ == "__main__":
         "n_estimators": 10000,
         "cat_features": [c for c in X.columns if X[c].dtypes == "int64"]
     }
-
     cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = cat_preds

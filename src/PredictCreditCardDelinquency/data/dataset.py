@@ -3,15 +3,13 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from category_encoders.ordinal import OrdinalEncoder
-from sklearn.cluster import KMeans
+from sklearn.preprocessing import LabelEncoder
 
 warnings.filterwarnings("ignore")
 
 
 def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     path = "../../input/predict-credit-card-delinquency/"
-
     train = pd.read_csv(path + "train.csv")
     train = train.drop(["index"], axis=1)
     train.fillna("NAN", inplace=True)
@@ -49,8 +47,8 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test["DAYS_BIRTH_week"] = test["DAYS_BIRTH_week"].astype(int)
 
     # Age
-    train["Age"] = np.abs(train["DAYS_BIRTH"]) // 365
-    test["Age"] = np.abs(test["DAYS_BIRTH"]) // 365
+    train["Age"] = np.abs(train["DAYS_BIRTH"]) // 360
+    test["Age"] = np.abs(test["DAYS_BIRTH"]) // 360
 
     # DAYS_EMPLOYED
     train["DAYS_EMPLOYED_month"] = np.floor(train["DAYS_EMPLOYED"] / 30) - (
@@ -71,8 +69,8 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test["DAYS_EMPLOYED_week"] = test["DAYS_EMPLOYED_week"].astype(int)
 
     # EMPLOYED
-    train["EMPLOYED"] = train["DAYS_EMPLOYED"] // 365
-    test["EMPLOYED"] = test["DAYS_EMPLOYED"] // 365
+    train["EMPLOYED"] = train["DAYS_EMPLOYED"] / 360
+    test["EMPLOYED"] = test["DAYS_EMPLOYED"] / 360
 
     # before_EMPLOYED
     train["before_EMPLOYED"] = train["DAYS_BIRTH"] - train["DAYS_EMPLOYED"]
@@ -110,27 +108,10 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
         + test["reality"].astype(str)
     )
 
-    cat_cols = [
-        "email",
-        "gender",
-        "car",
-        "reality",
-        "income_type",
-        "edu_type",
-        "family_type",
-        "house_type",
-        "occyp_type",
-        "gender_car_reality",
-    ]
-
-    le_encoder = OrdinalEncoder(cat_cols)
-    train[cat_cols] = le_encoder.fit_transform(train[cat_cols], train["credit"])
-    test[cat_cols] = le_encoder.transform(test[cat_cols])
-
     del_cols = [
-        # "email",
         "gender",
         "car",
+        "email",
         "reality",
         "child_num",
         "DAYS_BIRTH",
@@ -139,5 +120,20 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     train.drop(train.loc[train["family_size"] > 7, "family_size"].index, inplace=True)
     train.drop(del_cols, axis=1, inplace=True)
     test.drop(del_cols, axis=1, inplace=True)
+
+    cat_cols = [
+        "income_type",
+        "edu_type",
+        "family_type",
+        "house_type",
+        "occyp_type",
+        "gender_car_reality",
+    ]
+
+    for col in cat_cols:
+        label_encoder = LabelEncoder()
+        label_encoder = label_encoder.fit(train[col])
+        train[col] = label_encoder.transform(train[col])
+        test[col] = label_encoder.transform(test[col])
 
     return train, test

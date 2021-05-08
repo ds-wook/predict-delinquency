@@ -1,69 +1,41 @@
 # PredictCreditCardDelinquency
-신용카드 사용자 연체 예측 AI 경진대회
-## 데이터 변수 설명
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[신용카드 사용자 연체 예측 AI 경진대회](https://dacon.io/competitions/official/235713/overview/description)
 
-+ index
-+ gender: 성별
-+ car: 차량 소유 여부
-+ reality: 부동산 소유 여부
-+ child_num: 자녀 수
-+ income_total: 연간 소득
-+ income_type: 소득 분류
-
-        ['Commercial associate', 'Working', 'State servant', 'Pensioner', 'Student']
-+ edu_type: 교육 수준
-
-        ['Higher education', 'Secondary / secondary special', 'Incomplete higher', 'Lower secondary', 'Academic degree']
-
-+ family_type: 결혼 여부
-
-
-		['Married', 'Civil marriage', 'Separated', 'Single / not married', 'Widow']
-
-
-+ house_type: 생활 방식
+## Feature Engineering
++ income_type: 기본 변수
++ edu_type: 기본 변수
++ family_type: 기본 변수
++ house_type: 기본 변수
++ occyp_type: 기본 변수
++ begin_month: 중복 데이터를 구별할 수 있는 핵심 변수
++ DAYS_BIRTH_month: DAYS_BIRTH의 달
++ DAYS_BIRTH_week: DAYS_BIRTH의 주
++ Age: DAYS_BIRTH의 년도
++ DAYS_EMPLOYED_month: DAYS_EMPLOYED의 달
++ DAYS_EMPLOYED_week: DAYS_EMPLOYED의 주
++ EMPLOYED: DAYS_EMPLOYED의 년
++ before_EMPLOYED: DAYS_BIRTH와 DAYS_EMPLOYED의 차
++ before_EMPLOYED_month: 고용되기 전의 달
++ before_EMPLOYED_week: 고용 되기 전의 주
++ gender_car_reality: 성별, 차, 부동산 변수를 합침
 
 
-		['Municipal apartment', 'House / apartment', 'With parents', 'Co-op apartment', 'Rented apartment', 'Office apartment']
+### Model
++ category feature의 전처리가 필수적으로 중요
++ CatBoost를 활용하여 category feature들을 지정하여 모델의 성능을 높힘
++ LightGBM, XGBoost와 비교 후 더 나은 성능을 보임
 
-
-
-+ DAYS_BIRTH: 출생일
-
-                            
-        데이터 수집 당시 (0)부터 역으로 셈, 즉, -1은 데이터 수집일 하루 전에 태어났음을 의미
-
-
-
-+ DAYS_EMPLOYED: 업무 시작일
-
-
-		데이터 수집 당시 (0)부터 역으로 셈, 즉, -1은 데이터 수집일 하루 전부터 일을 시작함을 의미 양수 값은 고용되지 않은 상태를 의미함
-
-+ FLAG_MOBIL: 핸드폰 소유 여부
-
-+ work_phone: 업무용 전화 소유 여부
-
-+ phone: 전화 소유 여부
-
-+ email: 이메일 소유 여부
-
-+ occyp_type: 직업 유형	
-
-+ family_size: 가족 규모
-
-+ begin_month: 신용카드 발급 월
-			
-
-		데이터 수집 당시 (0)부터 역으로 셈, 즉, -1은 데이터 수집일 한 달 전에 신용카드를 발급함을 의미
-
-+ credit: 사용자의 신용카드 대금 연체를 기준의 신용도
-
-
-		=> 낮을 수록 높은 신용의 신용카드 사용자를 의미함
-
-### 모델
-+ LightGBM
 
 ## Cross Validation 전략
-+ Stratified K-Fold
++ Stratified K-Fold: 다중 분류문제에서 자주 쓰이는 기법 labeling의 sample을 잘 맞춰서 학습을 진행하도록 함
++ 10-fold로 진행하여 성능을 높힘
+
+
+## Benchmark
+|model|OOF(10-fold)|Public LB|Private LB|
+|------|:------:|:---------:|:-------:|:--------:|
+|LightGBM|0.68714|0.68674|-|
+|XGBoost|-|-|-|
+|RandomForest|-|-|-|
+|**CatBoost**|**0.67363**|**0.67364**|-|
