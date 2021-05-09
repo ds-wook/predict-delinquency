@@ -40,7 +40,6 @@ def objective(trial: Trial) -> float:
     }
 
     for fold, (train_idx, valid_idx) in enumerate(splits):
-        print(f"============ Fold {fold} ============\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
 
@@ -53,7 +52,7 @@ def objective(trial: Trial) -> float:
             eval_set=valid_data,
             early_stopping_rounds=100,
             use_best_model=True,
-            verbose=100,
+            verbose=False,
         )
 
         cat_oof[valid_idx] = model.predict_proba(X_valid)

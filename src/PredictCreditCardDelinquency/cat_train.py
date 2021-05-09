@@ -8,6 +8,7 @@ from model.gbdt import stratified_kfold_cat
 train, test = load_dataset()
 X = train.drop("credit", axis=1)
 y = train["credit"]
+cat_cols = [c for c in X.columns if X[c].dtypes == "int64"]
 X_test = test.copy()
 
 
@@ -22,19 +23,19 @@ if __name__ == "__main__":
     args = parse.parse_args()
 
     cat_params = {
-        "l2_leaf_reg": 0.08,
-        "max_depth": 10,
+        "learning_rate": 0.021303801352721558,
+        "l2_leaf_reg": 0.5504435701253788,
+        "max_depth": 6,
         "bagging_temperature": 1,
-        "min_data_in_leaf": 72,
-        "max_bin": 364,
+        "min_data_in_leaf": 48,
+        "max_bin": 471,
         "random_state": 42,
         "eval_metric": "MultiClass",
         "loss_function": "MultiClass",
-        "learning_rate": 0.01,
         "od_type": "Iter",
         "od_wait": 500,
-        "n_estimators": 10000,
-        "cat_features": [c for c in X.columns if X[c].dtypes == "int64"]
+        "iterations": 10000,
+        "cat_features": cat_cols,
     }
     cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)
     submission = pd.read_csv(path + "sample_submission.csv")
