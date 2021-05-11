@@ -40,5 +40,3 @@ if __name__ == "__main__":
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = cat_preds
     submission.to_csv(args.path + args.file, index=False)
-
-
