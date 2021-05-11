@@ -23,9 +23,9 @@ if __name__ == "__main__":
 
     rf_params = {
         "criterion": "gini",
-        "n_estimators": 10000,
+        "n_estimators": 300,
         "min_samples_split": 10,
-        "min_samples_leaf": 1,
+        "min_samples_leaf": 2,
         "max_features": "auto",
         "oob_score": True,
         "random_state": 42,

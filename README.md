@@ -8,6 +8,7 @@
 + family_type: 기본 변수
 + house_type: 기본 변수
 + occyp_type: 기본 변수
++ income_total: numeric한 변수를 category로 바꿈
 + begin_month: 중복 데이터를 구별할 수 있는 핵심 변수
 + DAYS_BIRTH_month: DAYS_BIRTH의 달
 + DAYS_BIRTH_week: DAYS_BIRTH의 주
@@ -21,9 +22,9 @@
 + gender_car_reality: 성별, 차, 부동산 변수를 합침
 
 
-### Model
+## 핵심 Model
 + category feature의 전처리가 필수적으로 중요
-+ CatBoost를 활용하여 category feature들을 지정하여 모델의 성능을 높힘
++ **CatBoost**를 활용하여 category feature들을 지정하여 모델의 성능을 높힘
 + LightGBM, XGBoost와 비교 후 더 나은 성능을 보임
 
 
@@ -39,8 +40,14 @@
 
 ## Benchmark
 |model|OOF(10-fold)|Public LB|Private LB|
-|-----|:---------:|:--------:|:--------:|
+|:-----|:---------|:--------|:--------|
 |LightGBM|0.68714|0.68674|-|
 |XGBoost|0.68901|0.68900|-|
-|RandomForest|0.68874|0.692956|-|
+|RandomForest|0.69137|0.69296|-|
+|TabNet|0.80392|0.77971|-|
 |**CatBoost**|**0.67322**|**0.67313**|-|
+
+
+## Ensemble Model
++ 예측값 $ \hat y = \beta_0 * catboost + \beta_1 * lightgbm + \beta_2 * xgboost + \beta_3 * random forest + \beta_4 * TabNet$ 을 모델링하여 logloss를 최대한 줄임
++ 각 $\beta_i(i=0, 1, 2...)$의 최적의 파라미터를 찾음

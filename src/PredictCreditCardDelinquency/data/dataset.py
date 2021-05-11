@@ -8,6 +8,26 @@ from sklearn.preprocessing import LabelEncoder
 warnings.filterwarnings("ignore")
 
 
+def category_income(data: pd.DataFrame) -> pd.DataFrame:
+    data["income_total"] = data["income_total"] / 10000
+    conditions = [
+        (data["income_total"].le(18)),
+        (data["income_total"].gt(18) & data["income_total"].le(33)),
+        (data["income_total"].gt(33) & data["income_total"].le(49)),
+        (data["income_total"].gt(49) & data["income_total"].le(64)),
+        (data["income_total"].gt(64) & data["income_total"].le(80)),
+        (data["income_total"].gt(80) & data["income_total"].le(95)),
+        (data["income_total"].gt(95) & data["income_total"].le(111)),
+        (data["income_total"].gt(111) & data["income_total"].le(126)),
+        (data["income_total"].gt(126) & data["income_total"].le(142)),
+        (data["income_total"].gt(142)),
+    ]
+    choices = [i for i in range(10)]
+
+    data["income_total"] = np.select(conditions, choices)
+    return data
+
+
 def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     path = "../../input/predict-credit-card-delinquency/"
     train = pd.read_csv(path + "train.csv")
@@ -27,6 +47,10 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test["DAYS_BIRTH"] = np.abs(test["DAYS_BIRTH"])
     train["begin_month"] = np.abs(train["begin_month"]).astype(int)
     test["begin_month"] = np.abs(test["begin_month"]).astype(int)
+
+    # income_total
+    train = category_income(train)
+    test = category_income(test)
 
     # DAYS_BIRTH
     train["DAYS_BIRTH_month"] = np.floor(train["DAYS_BIRTH"] / 30) - (
@@ -93,14 +117,14 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     test["before_EMPLOYED_week"] = test["before_EMPLOYED_week"].astype(int)
 
     # gender_car_reality
-    train["gender_car_reality"] = (
+    train["user_code"] = (
         train["gender"].astype(str)
         + "_"
         + train["car"].astype(str)
         + "_"
         + train["reality"].astype(str)
     )
-    test["gender_car_reality"] = (
+    test["user_code"] = (
         test["gender"].astype(str)
         + "_"
         + test["car"].astype(str)
@@ -111,8 +135,8 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
     del_cols = [
         "gender",
         "car",
-        "email",
         "reality",
+        "email",
         "child_num",
         "DAYS_BIRTH",
         "DAYS_EMPLOYED",
@@ -127,7 +151,7 @@ def load_dataset() -> Tuple[pd.DataFrame, pd.DataFrame]:
         "family_type",
         "house_type",
         "occyp_type",
-        "gender_car_reality",
+        "user_code",
     ]
 
     for col in cat_cols:

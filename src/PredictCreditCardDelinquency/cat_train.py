@@ -21,14 +21,13 @@ if __name__ == "__main__":
     parse.add_argument("--file", type=str, help="Input file name", default="model.csv")
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
-
     cat_params = {
-        "learning_rate": 0.021303801352721558,
-        "l2_leaf_reg": 0.5504435701253788,
-        "max_depth": 6,
+        "learning_rate": 0.009283085032171977,
+        "l2_leaf_reg": 0.1003575608618208,
+        "max_depth": 7,
         "bagging_temperature": 1,
-        "min_data_in_leaf": 48,
-        "max_bin": 471,
+        "min_data_in_leaf": 51,
+        "max_bin": 467,
         "random_state": 42,
         "eval_metric": "MultiClass",
         "loss_function": "MultiClass",
@@ -41,3 +40,5 @@ if __name__ == "__main__":
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = cat_preds
     submission.to_csv(args.path + args.file, index=False)
+
+
