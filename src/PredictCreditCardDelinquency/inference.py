@@ -9,6 +9,7 @@ if __name__ == "__main__":
     parse.add_argument("-w2", type=float, default=0.1)
     parse.add_argument("-w3", type=float, default=0.05)
     parse.add_argument("-w4", type=float, default=0.05)
+    parse.add_argument("-w5", type=float, default=0.1)
     parse.add_argument("--file", type=str, default="ensemble_model.csv")
     args = parse.parse_args()
 
@@ -16,6 +17,7 @@ if __name__ == "__main__":
     xgb_preds = pd.read_csv("../../submission/xgb_submit.csv")
     cat_preds = pd.read_csv("../../submission/cat_submit_test.csv")
     rf_preds = pd.read_csv("../../submission/rf_submit.csv")
+    tab_preds = pd.read_csv("../../submission/tabnet_submit.csv")
 
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = (
@@ -23,6 +25,7 @@ if __name__ == "__main__":
         + args.w2 * lgb_preds.iloc[:, 1:]
         + args.w3 * xgb_preds.iloc[:, 1:]
         + args.w4 * rf_preds.iloc[:, 1:]
+        + args.w5 * tab_preds.iloc[:, 1:]
     )
     submission.to_csv("../../submission/" + args.file, index=False)
     print("Finish!")
