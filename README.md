@@ -45,9 +45,9 @@
 |XGBoost|0.68901|0.68900|-|
 |RandomForest|0.69137|0.69296|-|
 |TabNet|0.80392|0.77971|-|
-|**CatBoost**|**0.67322**|**0.67313**|-|
+|**CatBoost**|**0.67234**|**0.67288**|-|
 
 
 ## Ensemble Model
-+ 예측값 $$ \hat y = \beta_0 * catboost + \beta_1 * lightgbm + \beta_2 * xgboost + \beta_3 * random forest + \beta_4 * TabNet$$ 을 모델링하여 logloss를 최대한 줄임
-+ 각 $\beta_i(i=0, 1, 2...)$의 최적의 파라미터를 찾음
+예측값 $ \hat y = \beta_0 * catboost + \beta_1 * lightgbm + \beta_2 * xgboost + \beta_3 * random forest + \beta_4 * TabNet$ 을 모델링하여 logloss를 최대한 줄임
+각 $\beta_i(i=0, 1, 2...)$의 최적의 파라미터를 찾음
