@@ -1,12 +1,17 @@
-from typing import Dict
+from typing import Dict, Tuple
 
+import lightgbm as lgbm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 from catboost import CatBoostClassifier, Pool
-from lightgbm import LGBMClassifier, plot_importance
+from lightgbm import LGBMClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
+from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 
 def stratified_kfold_lgbm(
@@ -16,7 +21,6 @@ def stratified_kfold_lgbm(
     y: pd.DataFrame,
     X_test: pd.DataFrame,
 ) -> np.ndarray:
-
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     lgb_oof = np.zeros((X.shape[0], 3))
@@ -47,12 +51,11 @@ def stratified_kfold_lgbm(
             verbose=100,
             init_model=pre_model,
         )
-
         lgb_oof[valid_idx] = model.predict_proba(X_valid)
         lgb_preds += model.predict_proba(X_test) / n_fold
 
     fig, ax = plt.subplots(figsize=(20, 14))
-    plot_importance(model, ax=ax, max_num_features=len(X_test.columns))
+    lgbm.plot_importance(model, ax=ax, max_num_features=len(X_test.columns))
     plt.savefig("../../graph/lgbm_import.png")
     log_score = log_loss(y, lgb_oof)
     print(f"Log Loss Score: {log_score:.5f}")
@@ -67,7 +70,6 @@ def stratified_kfold_cat(
     y: pd.DataFrame,
     X_test: pd.DataFrame,
 ) -> np.ndarray:
-
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     cat_oof = np.zeros((X.shape[0], 3))
@@ -97,3 +99,74 @@ def stratified_kfold_cat(
     log_score = log_loss(y, cat_oof)
     print(f"Log Loss Score: {log_score:.5f}\n")
     return cat_preds
+
+
+def stratified_kfold_xgb(
+    params: Dict[str, int],
+    n_fold: int,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    X_test: pd.DataFrame,
+) -> np.ndarray:
+
+    folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
+    splits = folds.split(X, y)
+    xgb_oof = np.zeros((X.shape[0], 3))
+    xgb_preds = np.zeros((X_test.shape[0], 3))
+
+    for fold, (train_idx, valid_idx) in enumerate(splits):
+        print(f"============ Fold {fold} ============\n")
+        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
+        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
+
+        model = XGBClassifier(**params)
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_train, y_train), (X_valid, y_valid)],
+            early_stopping_rounds=100,
+            verbose=100,
+        )
+
+        xgb_oof[valid_idx] = model.predict_proba(X_valid)
+        xgb_preds += model.predict_proba(X_test) / n_fold
+
+    fig, ax = plt.subplots(figsize=(20, 14))
+    xgb.plot_importance(model, ax=ax, max_num_features=len(X_test.columns))
+    plt.savefig("../../graph/xgb_import.png")
+    log_score = log_loss(y, xgb_oof)
+    print(f"Log Loss Score: {log_score:.5f}")
+
+    return xgb_preds
+
+
+def stratified_kfold_ada(
+    n_fold: int,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    X_test: pd.DataFrame,
+) -> Tuple[np.ndarray, np.ndarray]:
+    folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=2021)
+    splits = folds.split(X, y)
+    dt_oof = np.zeros(X.shape[0])
+    dt_preds = np.zeros(X_test.shape[0])
+
+    for fold, (train_idx, valid_idx) in enumerate(splits):
+        print(f"===== Fold {fold} =====")
+        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
+        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
+
+        model = AdaBoostClassifier(
+            DecisionTreeClassifier(max_depth=3), n_estimators=300, learning_rate=0.05
+        )
+        model.fit(X_train, y_train)
+
+        dt_oof[valid_idx] = model.predict(X_valid)
+        dt_preds += model.predict_proba(X_test)[:, 1] / n_fold
+
+        print(f"Log Loss Score: {log_loss(y_valid, dt_oof[valid_idx]):.5f}")
+
+    log_score = log_loss(y, dt_oof)
+    print(f"Log Loss Score: {log_score:.5f}")
+
+    return dt_oof, dt_preds

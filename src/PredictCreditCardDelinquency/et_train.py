@@ -1,9 +1,10 @@
 import argparse
 
+import joblib
 import pandas as pd
 
 from data.dataset import load_dataset
-from model.gbdt import stratified_kfold_cat
+from model.bagging import stratified_kfold_et
 
 train, test = load_dataset()
 X = train.drop("credit", axis=1)
@@ -21,23 +22,8 @@ if __name__ == "__main__":
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
-    cat_params = {
-        "learning_rate": 0.021303801352721558,
-        "l2_leaf_reg": 0.5504435701253788,
-        "max_depth": 6,
-        "bagging_temperature": 1,
-        "min_data_in_leaf": 48,
-        "max_bin": 471,
-        "random_state": 42,
-        "eval_metric": "MultiClass",
-        "loss_function": "MultiClass",
-        "od_type": "Iter",
-        "od_wait": 500,
-        "iterations": 10000,
-        "cat_features": [c for c in X.columns if X[c].dtypes == "int64"],
-    }
-
-    cat_preds = stratified_kfold_cat(cat_params, args.fold, X, y, X_test)
+    et_oof, et_preds = stratified_kfold_et(args.fold, X, y, X_test)
+    joblib.dump(et_oof, args.path + "et_oof.pkl")
     submission = pd.read_csv(path + "sample_submission.csv")
-    submission.iloc[:, 1:] = cat_preds
+    submission.iloc[:, 1:] = et_preds
     submission.to_csv(args.path + args.file, index=False)
