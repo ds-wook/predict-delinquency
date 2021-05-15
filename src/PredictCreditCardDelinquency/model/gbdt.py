@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Union, List
 
 import lightgbm as lgbm
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ from xgboost import XGBClassifier
 
 
 def stratified_kfold_lgbm(
-    params: Dict[str, int],
+    params: Dict[str, Union[int, float, str]],
     n_fold: int,
     X: pd.DataFrame,
     y: pd.DataFrame,
@@ -62,7 +62,7 @@ def stratified_kfold_lgbm(
 
 
 def stratified_kfold_cat(
-    params: Dict[str, int],
+    params: Dict[str, Union[int, float, str, List[str]]],
     n_fold: int,
     X: pd.DataFrame,
     y: pd.DataFrame,
@@ -100,7 +100,7 @@ def stratified_kfold_cat(
 
 
 def stratified_kfold_xgb(
-    params: Dict[str, int],
+    params: Dict[str, Union[int, float, str]],
     n_fold: int,
     X: pd.DataFrame,
     y: pd.DataFrame,
