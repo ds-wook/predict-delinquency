@@ -1,5 +1,6 @@
 import argparse
 
+import joblib
 import pandas as pd
 
 from data.dataset import load_dataset
@@ -29,10 +30,11 @@ if __name__ == "__main__":
         "max_features": "auto",
         "oob_score": True,
         "random_state": 42,
-        "n_jobs": -1
+        "n_jobs": -1,
     }
-    rf_preds = stratified_kfold_rf(rf_params, args.fold, X, y, X_test)
+    rf_oof, rf_preds = stratified_kfold_rf(rf_params, args.fold, X, y, X_test)
 
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = rf_preds
     submission.to_csv(args.path + args.file, index=False)
+    joblib.dump(rf_oof, args.path + "rf_oof.pkl")

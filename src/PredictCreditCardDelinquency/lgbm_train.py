@@ -1,5 +1,6 @@
 import argparse
 
+import joblib
 import pandas as pd
 
 from data.dataset import load_dataset
@@ -21,9 +22,10 @@ if __name__ == "__main__":
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
-    lgb_params = pd.read_pickle("../../parameters/best_lgbm_params.pkl")
-    lgb_preds = stratified_kfold_lgbm(lgb_params, args.fold, X, y, X_test)
+    lgb_params = pd.read_pickle("../../parameters/feg_lgbm_params.pkl")
+    lgb_oof, lgb_preds = stratified_kfold_lgbm(lgb_params, args.fold, X, y, X_test)
 
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = lgb_preds
     submission.to_csv(args.path + args.file, index=False)
+    joblib.dump(lgb_oof, args.path + "lgb_oof.pkl")

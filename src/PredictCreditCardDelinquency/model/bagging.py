@@ -37,4 +37,4 @@ def stratified_kfold_rf(
     log_score = log_loss(y, rf_oof)
     print(f"Log Loss Score: {log_score:.5f}")
 
-    return rf_preds
+    return rf_oof, rf_preds

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import lightgbm as lgbm
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ def stratified_kfold_lgbm(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     lgb_oof = np.zeros((X.shape[0], 3))
@@ -58,7 +58,7 @@ def stratified_kfold_lgbm(
     log_score = log_loss(y, lgb_oof)
     print(f"Log Loss Score: {log_score:.5f}")
 
-    return lgb_preds
+    return lgb_oof, lgb_preds
 
 
 def stratified_kfold_cat(
@@ -67,7 +67,7 @@ def stratified_kfold_cat(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     cat_oof = np.zeros((X.shape[0], 3))
@@ -96,7 +96,7 @@ def stratified_kfold_cat(
 
     log_score = log_loss(y, cat_oof)
     print(f"Log Loss Score: {log_score:.5f}\n")
-    return cat_preds
+    return cat_oof, cat_preds
 
 
 def stratified_kfold_xgb(
@@ -105,7 +105,7 @@ def stratified_kfold_xgb(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
 
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
@@ -135,4 +135,4 @@ def stratified_kfold_xgb(
     log_score = log_loss(y, xgb_oof)
     print(f"Log Loss Score: {log_score:.5f}")
 
-    return xgb_preds
+    return xgb_oof, xgb_preds

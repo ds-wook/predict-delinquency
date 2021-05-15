@@ -34,8 +34,11 @@
 
 
 ## Hyperparameter 전략
-+ Bayesian TPE 방식으로 빠르게 하이퍼파라미터 튜닝
++ Bayesian TPE 방식으로 빠르게 하이퍼파라미터 튜닝 -> AutoML로 접근
 + 최단시간에 최고효율이 나오게끔 함
++ CatBoost의 경우 하이퍼파라미터에 민감하지 않았으나 좀 더 나은 성능을 개선하기 위해서 Bayesian TPE방식 사용
++ Lightgbm, XGBoost도 Bayesian TPE방식 사용
++ RandomForest와 TabNet 같은 경우는 직접 하이퍼파라미터 튜닝함
 
 
 ## Benchmark
@@ -49,5 +52,7 @@
 
 
 ## Ensemble Model
-예측값 $$ \hat y = \beta_0 * w_0 + \beta_1 * w_1 + \beta_2 * w_2 + \beta_3 * w_3 + \beta_4 * w_4 $$을 모델링하여 logloss를 최대한 줄임
-각 $ \beta_i(i=0, 1, 2...) $의 최적의 파라미터를 찾음
+
++ 예측값 $ \hat y = \beta_0 * w_0 + \beta_1 * w_1 + \beta_2 * w_2 + \beta_3 * w_3 + \beta_4 * w_4 $을 모델링하여 logloss를 최대한 줄임
++ 각 $ \beta_i(i=0, 1, 2...) $의 최적의 파라미터를 찾음
++ $w_0 = 0.929$, $w_1 = 0.05$, $w_2 = 0.01$, $w_3 = 0.01$, $w_4 = 0.001$로 LogLoss값을 0.6724072532로 만듬
