@@ -9,9 +9,9 @@ from optuna.samplers import TPESampler
 from sklearn.metrics import log_loss
 from sklearn.model_selection import StratifiedKFold
 
-from data.dataset import load_dataset
+from data.dataset import cat_load_dataset
 
-train, test = load_dataset()
+train, test = cat_load_dataset()
 
 X = train.drop("credit", axis=1)
 y = train["credit"]

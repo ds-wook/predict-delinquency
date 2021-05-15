@@ -53,6 +53,5 @@
 
 ## Ensemble Model
 
-+ 예측값 $ \hat y = \beta_0 * w_0 + \beta_1 * w_1 + \beta_2 * w_2 + \beta_3 * w_3 + \beta_4 * w_4 $을 모델링하여 logloss를 최대한 줄임
-+ 각 $ \beta_i(i=0, 1, 2...) $의 최적의 파라미터를 찾음
-+ $w_0 = 0.929$, $w_1 = 0.05$, $w_2 = 0.01$, $w_3 = 0.01$, $w_4 = 0.001$로 LogLoss값을 0.6724072532로 만듬
++ Stacking Ensemble을 통해서 Neural Network가 확률값을 잘 학습하는 모델 구축
+

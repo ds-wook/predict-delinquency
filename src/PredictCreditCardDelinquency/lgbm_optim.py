@@ -11,11 +11,11 @@ from sklearn.model_selection import StratifiedKFold
 
 from data.dataset import load_dataset
 
-train_ohe, test_ohe = load_dataset()
+train, test = load_dataset()
 
-X = train_ohe.drop("credit", axis=1)
-y = train_ohe["credit"]
-X_test = test_ohe.copy()
+X = train.drop("credit", axis=1)
+y = train["credit"]
+X_test = test.copy()
 
 
 def objective(trial: Trial) -> float:

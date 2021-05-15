@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ def stratified_kfold_rf(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, np.ndarray]:
 
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
