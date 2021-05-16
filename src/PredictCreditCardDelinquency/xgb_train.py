@@ -22,11 +22,10 @@ if __name__ == "__main__":
     parse.add_argument("--fold", type=int, default=10)
     args = parse.parse_args()
 
-    xgb_params = pd.read_pickle("../../parameters/best_feg_xgb_params.pkl")
+    xgb_params = pd.read_pickle("../../parameters/best_xgb_params.pkl")
     xgb_oof, xgb_preds = stratified_kfold_xgb(xgb_params, args.fold, X, y, X_test)
 
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = xgb_preds
     submission.to_csv(args.path + args.file, index=False)
     joblib.dump(xgb_oof, args.path + "xgb_oof.pkl")
-
