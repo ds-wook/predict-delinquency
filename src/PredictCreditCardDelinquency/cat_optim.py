@@ -75,6 +75,7 @@ if __name__ == "__main__":
     study.optimize(objective, n_trials=args.trials)
     print("Best Score:", study.best_value)
     print("Best trial:", study.best_trial.params)
+
     params = study.best_trial.params
     params["random_state"] = 42
     params["eval_metric"] = "MultiClass"

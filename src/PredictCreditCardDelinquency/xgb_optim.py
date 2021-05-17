@@ -6,19 +6,22 @@ import optuna
 from optuna import Trial
 from optuna.samplers import TPESampler
 from sklearn.metrics import log_loss
-from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.model_selection import StratifiedKFold
 from xgboost import XGBClassifier
 
 from data.dataset import load_dataset
 
-train_ohe, test_ohe = load_dataset()
+train, test = load_dataset()
 
-X = train_ohe.drop("credit", axis=1)
-y = train_ohe["credit"]
-X_test = test_ohe.copy()
+X = train.drop("credit", axis=1)
+y = train["credit"]
+X_test = test.copy()
 
 
 def objective(trial: Trial) -> float:
+    folds = StratifiedKFold(n_splits=args.fold, shuffle=True, random_state=42)
+    splits = folds.split(X, y)
+    xgb_oof = np.zeros((X.shape[0], 3))
     params_lgb = {
         "random_state": 42,
         "n_estimators": 10000,
@@ -35,19 +38,20 @@ def objective(trial: Trial) -> float:
         "gamma": trial.suggest_float("gamma", 0.5, 1),
     }
 
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2)
-    model = XGBClassifier(**params_lgb)
-    model.fit(
-        X_train,
-        y_train,
-        eval_set=[(X_train, y_train), (X_valid, y_valid)],
-        early_stopping_rounds=100,
-        verbose=False,
-    )
+    for fold, (train_idx, valid_idx) in enumerate(splits):
+        X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
+        y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
+        model = XGBClassifier(**params_lgb)
+        model.fit(
+            X_train,
+            y_train,
+            eval_set=[(X_train, y_train), (X_valid, y_valid)],
+            early_stopping_rounds=100,
+            verbose=False,
+        )
 
-    xgb_pred = model.predict_proba(X_valid)
-    log_score = log_loss(y, xgb_pred)
-
+        xgb_oof[valid_idx] = model.predict_proba(X_valid)
+    log_score = log_loss(y, xgb_oof)
     return log_score
 
 
@@ -65,7 +69,6 @@ if __name__ == "__main__":
         sampler=sampler,
     )
     study.optimize(objective, n_trials=args.trials)
-
     print("Best Score:", study.best_value)
     print("Best trial:", study.best_trial.params)
 
