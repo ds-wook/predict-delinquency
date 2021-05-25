@@ -40,6 +40,9 @@
 + Lightgbm, XGBoost도 Bayesian TPE방식 사용
 + RandomForest와 TabNet 같은 경우는 직접 하이퍼파라미터 튜닝함
 
+## Ensemble Model
+
++ Stacking Ensemble을 통해서 Neural Network가 확률값을 잘 학습하는 모델 구축
 
 ## Benchmark
 |model|OOF(10-fold)|Public LB|Private LB|
@@ -49,9 +52,4 @@
 |RandomForest|0.69137|0.69296|-|
 |TabNet|0.80392|0.77971|-|
 |**CatBoost**|**0.67234**|**0.67288**|-|
-
-
-## Ensemble Model
-
-+ Stacking Ensemble을 통해서 Neural Network가 확률값을 잘 학습하는 모델 구축
-
+|**Stacking Ensemble**|**0.67064**|**0.67126**|-|

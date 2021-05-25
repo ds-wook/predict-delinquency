@@ -28,10 +28,3 @@ if __name__ == "__main__":
         + args.w5 * tab_preds.iloc[:, 1:]
     )
     submission.to_csv("../../submission/" + args.file, index=False)
-    print("Finish!")
-    print("LGBM")
-    print(pd.read_pickle("../../parameters/best_feg_lgbm_params.pkl"))
-    print("XGB")
-    print(pd.read_pickle("../../parameters/best_feg_xgb_params.pkl"))
-    print("CatBoost")
-    print(pd.read_pickle("../../parameters/best_cat_params.pkl"))
