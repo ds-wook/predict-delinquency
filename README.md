@@ -53,3 +53,13 @@
 |TabNet|0.80392|0.77971|-|
 |**CatBoost**|**0.67234**|**0.67288**|-|
 |**Stacking Ensemble**|**0.67069**|**0.67048**|-|
+
+
+## Paper
+
++ [CatBoost: unbiased boosting with categorical features](https://arxiv.org/pdf/1706.09516.pdf)
++ [Efficient Click-Through Rate Prediction for Developing Countries via Tabular Learning](https://arxiv.org/abs/2104.07553)
+
+
+## 순위
+public 3위 private 2위
