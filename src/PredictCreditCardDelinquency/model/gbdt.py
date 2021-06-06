@@ -27,7 +27,7 @@ def stratified_kfold_lgbm(
 
     for fold, (train_idx, valid_idx) in enumerate(splits, 1):
         if verbose:
-            print(f"\tFold{fold}\n")
+            print(f"\tFold {fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
         pre_model = LGBMClassifier(**params)
@@ -79,7 +79,7 @@ def stratified_kfold_cat(
 
     for fold, (train_idx, valid_idx) in enumerate(splits, 1):
         if verbose:
-            print(f"\tFold{fold}\n")
+            print(f"\tFold {fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
         train_data = Pool(data=X_train, label=y_train, cat_features=cat_cols)
@@ -119,7 +119,7 @@ def stratified_kfold_xgb(
 
     for fold, (train_idx, valid_idx) in enumerate(splits, 1):
         if verbose:
-            print(f"\tFold{fold}\n")
+            print(f"\tFold {fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
 
