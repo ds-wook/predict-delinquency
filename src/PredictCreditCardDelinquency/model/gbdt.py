@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Union, List
+from typing import Dict, List, Tuple, Union
 
 import lightgbm as lgbm
 import matplotlib.pyplot as plt
@@ -18,14 +18,16 @@ def stratified_kfold_lgbm(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
+    verbose: Union[int, bool] = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
     lgb_oof = np.zeros((X.shape[0], 3))
     lgb_preds = np.zeros((X_test.shape[0], 3))
 
-    for fold, (train_idx, valid_idx) in enumerate(splits):
-        print(f"============ Fold {fold} ============\n")
+    for fold, (train_idx, valid_idx) in enumerate(splits, 1):
+        if verbose:
+            print(f"\tFold{fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
         pre_model = LGBMClassifier(**params)
@@ -35,7 +37,7 @@ def stratified_kfold_lgbm(
             y_train,
             eval_set=[(X_train, y_train), (X_valid, y_valid)],
             early_stopping_rounds=100,
-            verbose=100,
+            verbose=verbose,
         )
         params2 = params.copy()
         params2["learning_rate"] = params["learning_rate"] * 0.1
@@ -67,6 +69,7 @@ def stratified_kfold_cat(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
+    verbose: Union[int, bool] = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
     splits = folds.split(X, y)
@@ -74,8 +77,9 @@ def stratified_kfold_cat(
     cat_preds = np.zeros((X_test.shape[0], 3))
     cat_cols = [c for c in X.columns if X[c].dtypes == "int64"]
 
-    for fold, (train_idx, valid_idx) in enumerate(splits):
-        print(f"============ Fold {fold} ============\n")
+    for fold, (train_idx, valid_idx) in enumerate(splits, 1):
+        if verbose:
+            print(f"\tFold{fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
         train_data = Pool(data=X_train, label=y_train, cat_features=cat_cols)
@@ -88,7 +92,7 @@ def stratified_kfold_cat(
             eval_set=valid_data,
             early_stopping_rounds=100,
             use_best_model=True,
-            verbose=100,
+            verbose=verbose,
         )
 
         cat_oof[valid_idx] = model.predict_proba(X_valid)
@@ -105,6 +109,7 @@ def stratified_kfold_xgb(
     X: pd.DataFrame,
     y: pd.DataFrame,
     X_test: pd.DataFrame,
+    verbose: Union[int, bool] = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
 
     folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=42)
@@ -112,8 +117,9 @@ def stratified_kfold_xgb(
     xgb_oof = np.zeros((X.shape[0], 3))
     xgb_preds = np.zeros((X_test.shape[0], 3))
 
-    for fold, (train_idx, valid_idx) in enumerate(splits):
-        print(f"============ Fold {fold} ============\n")
+    for fold, (train_idx, valid_idx) in enumerate(splits, 1):
+        if verbose:
+            print(f"\tFold{fold}\n")
         X_train, X_valid = X.iloc[train_idx], X.iloc[valid_idx]
         y_train, y_valid = y.iloc[train_idx], y.iloc[valid_idx]
 
@@ -123,7 +129,7 @@ def stratified_kfold_xgb(
             y_train,
             eval_set=[(X_train, y_train), (X_valid, y_valid)],
             early_stopping_rounds=100,
-            verbose=100,
+            verbose=verbose,
         )
 
         xgb_oof[valid_idx] = model.predict_proba(X_valid)

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     args = parse.parse_args()
 
     xgb_params = pd.read_pickle("../../parameters/best_xgb_params.pkl")
-    xgb_oof, xgb_preds = stratified_kfold_xgb(xgb_params, args.fold, X, y, X_test)
+    xgb_oof, xgb_preds = stratified_kfold_xgb(xgb_params, args.fold, X, y, X_test, 100)
 
     submission = pd.read_csv(path + "sample_submission.csv")
     submission.iloc[:, 1:] = xgb_preds
