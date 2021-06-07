@@ -9,13 +9,16 @@ def define_argparser():
     parse.add_argument("--fold", type=int, default=10)
     parse.add_argument("--trials", type=int, default=360)
     parse.add_argument("--params", type=str, default="params.pkl")
+    parse.add_argument(
+        "--path", type=str, default="../../input/predict-credit-card-delinquency/"
+    )
     args = parse.parse_args()
     return args
 
 
 def _main(args: argparse.Namespace):
-    train, test = load_dataset()
-
+    path = args.path
+    train, test = load_dataset(path)
     X = train.drop("credit", axis=1)
     y = train["credit"]
     X_test = test.copy()
