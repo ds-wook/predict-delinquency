@@ -24,7 +24,8 @@ class BayesianOptimizer:
         if verbose:
             self.display_study_statistics(study)
         return study
-
+    
+    @staticmethod
     def display_study_statistics(study: optuna.create_study):
         print("Best Score:", study.best_value)
         print("Best trial:", study.best_trial.params)
