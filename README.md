@@ -45,14 +45,14 @@
 + Stacking Ensemble을 통해서 Neural Network가 확률값을 잘 학습하는 모델 구축
 
 ## Benchmark
-|model|OOF(10-fold)|Public LB|Private LB|
-|:-----|:---------|:--------|:--------|
-|LightGBM|0.68714|0.68591|0.66815|
-|XGBoost|0.68901|0.68900|-|
-|RandomForest|0.69137|0.69296|-|
-|TabNet|0.80392|0.77971|-|
-|**CatBoost**|**0.67234**|**0.67288**|**0.66349**|
-|**Stacking Ensemble**|**0.67069**|**0.67048**|**0.65862**|
+|model|OOF(10-fold)|Public LB|
+|:-----|:---------|:--------|
+|LightGBM|0.68714|0.68591|
+|XGBoost|0.68901|0.68900|
+|RandomForest|0.69137|0.69296|
+|TabNet|0.80392|0.77971|
+|CatBoost|0.67234|0.67288|
+|**Stacking Ensemble**|**0.67069**|**0.67048**|
 
 
 ## Paper
