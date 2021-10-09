@@ -44,6 +44,9 @@
 
 + Stacking Ensemble을 통해서 Neural Network가 확률값을 잘 학습하는 모델 구축
 
+## Model Architecture
+![image](https://user-images.githubusercontent.com/46340424/136636342-ca94ce89-3448-4059-bcae-fa3bf3738d1e.png)
+
 ## Benchmark
 |model|OOF(10-fold)|Public LB|
 |:-----|:---------|:--------|
