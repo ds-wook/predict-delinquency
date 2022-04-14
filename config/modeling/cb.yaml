@@ -1,0 +1,51 @@
+hydra:
+  run:
+    dir: log/outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: null
+dataset:
+  path: input/open/
+  target: credit
+  train: train.csv
+  test: test.csv
+  cat_features:
+  - income_total
+  - income_type
+  - edu_type
+  - family_type
+  - house_type
+  - FLAG_MOBIL
+  - work_phone
+  - phone
+  - occyp_type
+  - begin_month
+  - DAYS_BIRTH_month
+  - DAYS_BIRTH_week
+  - Age
+  - DAYS_EMPLOYED_month
+  - DAYS_EMPLOYED_week
+  - before_EMPLOYED
+  - before_EMPLOYED_month
+  - before_EMPLOYED_week
+  - user_code
+experiment:
+  project: ds-wook/dacon-project
+  tags:
+    - CatBoost
+model:
+  fold: 5
+  params:
+    learning_rate: 0.026612467217016746
+    l2_leaf_reg: 0.3753065117824262
+    max_depth: 8
+    bagging_temperature: 1
+    min_data_in_leaf: 57
+    max_bin: 494
+    eval_metric: MultiClass
+    loss_function: MultiClass
+    od_type: Iter
+    od_wait: 500
+    iterations: 10000
+  path: models/5fold_catboost_models.pkl
+  early_stopping_rounds: 100
+  seed: 42
+  verbose: 100

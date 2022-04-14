@@ -1,39 +1,24 @@
 import warnings
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
+from omegaconf import DictConfig
 from sklearn.preprocessing import LabelEncoder
+from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
 
-def category_income(data: pd.DataFrame) -> pd.DataFrame:
-    data["income_total"] = data["income_total"] / 10000
-    conditions = [
-        (data["income_total"].le(18)),
-        (data["income_total"].gt(18) & data["income_total"].le(33)),
-        (data["income_total"].gt(33) & data["income_total"].le(49)),
-        (data["income_total"].gt(49) & data["income_total"].le(64)),
-        (data["income_total"].gt(64) & data["income_total"].le(80)),
-        (data["income_total"].gt(80) & data["income_total"].le(95)),
-        (data["income_total"].gt(95) & data["income_total"].le(111)),
-        (data["income_total"].gt(111) & data["income_total"].le(126)),
-        (data["income_total"].gt(126) & data["income_total"].le(142)),
-        (data["income_total"].gt(142)),
-    ]
-    choices = [i for i in range(10)]
-
-    data["income_total"] = np.select(conditions, choices)
-    return data
-
-
-def load_dataset(path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    train = pd.read_csv(path + "train.csv")
+def load_dataset(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    path = Path(get_original_cwd()) / config.dataset.path
+    train = pd.read_csv(path / config.dataset.train)
     train = train.drop(["index"], axis=1)
     train.fillna("NAN", inplace=True)
 
-    test = pd.read_csv(path + "test.csv")
+    test = pd.read_csv(path / config.dataset.test)
     test = test.drop(["index"], axis=1)
     test.fillna("NAN", inplace=True)
 
@@ -149,7 +134,7 @@ def load_dataset(path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
         "user_code",
     ]
 
-    for col in cat_cols:
+    for col in tqdm(cat_cols):
         label_encoder = LabelEncoder()
         label_encoder = label_encoder.fit(train[col])
         train[col] = label_encoder.transform(train[col])
