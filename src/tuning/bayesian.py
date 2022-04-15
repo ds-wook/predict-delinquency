@@ -93,7 +93,7 @@ class BayesianSearch:
         """
         path = Path(get_original_cwd()) / self.config.search.path_name
 
-        with open(path, "w") as f:
+        with open(path, "r") as f:
             update_params = yaml.load(f, Loader=yaml.FullLoader)
 
         update_params.model.params.update(study.best_trial.params)
