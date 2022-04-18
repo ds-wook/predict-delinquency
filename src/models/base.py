@@ -2,7 +2,7 @@ import gc
 import logging
 import pickle
 import warnings
-from abc import abstractclassmethod
+from abc import ABCMeta, abstractclassmethod
 from pathlib import Path
 from typing import Any, Callable, Dict, NamedTuple
 
@@ -21,7 +21,7 @@ class ModelResult(NamedTuple):
     scores: Dict[str, float]
 
 
-class BaseModel:
+class BaseModel(metaclass=ABCMeta):
     def __init__(self, config: DictConfig, metric: Callable, search: bool = False):
         self.config = config
         self.metric = metric

@@ -1,6 +1,6 @@
 import logging
 import warnings
-from abc import abstractclassmethod
+from abc import abstractclassmethod, ABCMeta
 from functools import partial
 from pathlib import Path
 from typing import Optional
@@ -18,7 +18,7 @@ from optuna.trial import FrozenTrial
 warnings.filterwarnings("ignore")
 
 
-class BaseTuner:
+class BaseTuner(metaclass=ABCMeta):
     def __init__(self, config: DictConfig, run: Optional[Run] = None):
         self.config = config
         self.run = run

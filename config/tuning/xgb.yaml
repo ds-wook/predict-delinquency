@@ -22,7 +22,7 @@ model:
   metric: mlogloss
   early_stopping_rounds: 100
   seed: 42
-  verbose: 100
+  verbose: False
 search:
   study_name: TPE Search
   mode: tpe
