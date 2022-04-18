@@ -133,3 +133,4 @@ input/*
 output/*
 !output/.gitkeep
 log/*
+models/*

@@ -1,6 +1,5 @@
 import warnings
 
-import neptune.new as neptune
 import pandas as pd
 from catboost import CatBoostClassifier, Pool
 from lightgbm import LGBMClassifier
@@ -91,8 +90,6 @@ class CatBoostTrainer(BaseModel):
             early_stopping_rounds=self.config.model.early_stopping_rounds,
             verbose=self.config.model.verbose,
         )
-
-        self.run[f"curve/fold_{fold}"].upload(neptune.types.File.as_html())
 
         return model
 

@@ -3,10 +3,8 @@ hydra:
     dir: log/outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
   output_subdir: null
 dataset:
-  labels: train_labels.csv
-  groups: sequence
-  path: input/tabular-playground-series-apr-2022
-  target: state
+  path: input/open/
+  target: credit
   train: train.csv
   test: test.csv
 experiment:
@@ -19,14 +17,15 @@ model:
   params:
     n_estimators: 10000
     n_jobs: -1
-    objective: binary:logistic
+    objective: multi:softmax
   path: models/5fold_xgboost_models.pkl
-  metric: auc
+  metric: mlogloss
   early_stopping_rounds: 100
   seed: 42
   verbose: 100
 search:
   study_name: TPE Search
+  mode: tpe
   direction: maximize
   seed: 42
   min_resource: 1

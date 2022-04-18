@@ -3,10 +3,8 @@ hydra:
     dir: log/outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
   output_subdir: null
 dataset:
-  labels: train_labels.csv
-  groups: sequence
-  path: input/tabular-playground-series-apr-2022
-  target: state
+  path: input/open/
+  target: credit
   train: train.csv
   test: test.csv
 experiment:

@@ -4,14 +4,13 @@ import pickle
 import warnings
 from abc import abstractclassmethod
 from pathlib import Path
-from typing import Any, Callable, Dict, NamedTuple, Union
+from typing import Any, Callable, Dict, NamedTuple
 
 import numpy as np
 import pandas as pd
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
 from sklearn.model_selection import StratifiedKFold
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
@@ -52,9 +51,7 @@ class BaseModel:
         with open(model_path, "wb") as output:
             pickle.dump(self.result, output, pickle.HIGHEST_PROTOCOL)
 
-    def train(
-        self, train_x: pd.DataFrame, train_y: pd.Series
-    ) -> ModelResult:
+    def train(self, train_x: pd.DataFrame, train_y: pd.Series) -> ModelResult:
         """
         Train data
         Args:
