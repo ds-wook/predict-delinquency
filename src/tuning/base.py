@@ -27,6 +27,7 @@ class BaseTuner(metaclass=ABCMeta):
     def _objective(self, trial: FrozenTrial, config: DictConfig) -> float:
         """
         Objective function
+
         Args:
             trial: trial object
             config: config object
@@ -38,6 +39,7 @@ class BaseTuner(metaclass=ABCMeta):
     def build_study(self, verbose: bool = False) -> Study:
         """
         Build study
+
         Args:
             study_name: study name
         Returns:
@@ -104,6 +106,7 @@ class BaseTuner(metaclass=ABCMeta):
     def save_hyperparameters(self, study: Study) -> None:
         """
         Save best hyperparameters to yaml file
+
         Args:
             study: study best hyperparameter object.
         """
@@ -118,6 +121,7 @@ class BaseTuner(metaclass=ABCMeta):
     def display_study(study: Study) -> None:
         """
         Display best metric score and hyperparameters
+
         Args:
             study: study best hyperparameter object.
         """
@@ -132,6 +136,7 @@ class BaseTuner(metaclass=ABCMeta):
 def create_sampler(mode: str, seed: int) -> BaseSampler:
     """
     Create sampler
+
     Args:
         sampler_mode: sampler mode
         seed: seed
