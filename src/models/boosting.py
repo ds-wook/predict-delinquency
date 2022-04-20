@@ -4,7 +4,8 @@ import pandas as pd
 from catboost import CatBoostClassifier, Pool
 from lightgbm import LGBMClassifier
 from neptune.new import Run
-from neptune.new.integrations import lightgbm, xgboost
+import neptune.new.integrations.lightgbm as nep_lgbm_utils
+import neptune.new.integrations.xgboost as nep_xgb_utils
 from xgboost import XGBClassifier
 
 from models.base import BaseModel
@@ -29,7 +30,7 @@ class LightGBMTrainer(BaseModel):
         load train model
         """
         neptune_callback = (
-            lightgbm.NeptuneCallback(
+            nep_lgbm_utils.NeptuneCallback(
                 run=self.run,
                 base_namespace=f"fold_{fold}",
                 log_tree=[0, 1, 2, 3],
@@ -90,6 +91,8 @@ class CatBoostTrainer(BaseModel):
             early_stopping_rounds=self.config.model.early_stopping_rounds,
             verbose=self.config.model.verbose,
         )
+        self.run[f"catboost/fold_{fold}/best_iteration"] = model.best_iteration_
+        self.run[f"catboost/fold_{fold}/best_score"] = model.best_score_
 
         return model
 
@@ -111,7 +114,7 @@ class XGBoostTrainer(BaseModel):
         load train model
         """
         neptune_callback = (
-            xgboost.NeptuneCallback(
+            nep_xgb_utils.NeptuneCallback(
                 run=self.run,
                 base_namespace=f"fold_{fold}",
                 log_tree=[0, 1, 2, 3],

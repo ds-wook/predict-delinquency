@@ -1,8 +1,8 @@
-import pandas as pd
 import numpy as np
+from pandas import DataFrame
 
 
-def category_income(data: pd.DataFrame) -> pd.DataFrame:
+def category_income(data: DataFrame) -> DataFrame:
     data["income_total"] = data["income_total"] / 10000
     conditions = [
         (data["income_total"].le(18)),

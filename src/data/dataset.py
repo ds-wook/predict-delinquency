@@ -6,13 +6,14 @@ import numpy as np
 import pandas as pd
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
+from pandas import DataFrame
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
 
-def load_dataset(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_dataset(config: DictConfig) -> Tuple[DataFrame, DataFrame]:
     path = Path(get_original_cwd()) / config.dataset.path
     train = pd.read_csv(path / config.dataset.train)
     train = train.drop(["index"], axis=1)
