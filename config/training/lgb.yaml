@@ -7,6 +7,7 @@ dataset:
   target: credit
   train: train.csv
   test: test.csv
+  is_catboost: False
   cat_features:
   - income_total
   - income_type
@@ -28,24 +29,31 @@ dataset:
   - before_EMPLOYED_week
   - user_code
 experiment:
-  project: ds-wook/dacon-project
+  project: ds-wook/cdal
   tags:
-    - CatBoost
+  - LightGBM
 model:
-  fold: 5
+  fold: 10
   params:
-    learning_rate: 0.026612467217016746
-    l2_leaf_reg: 0.3753065117824262
-    max_depth: 8
-    bagging_temperature: 1
-    min_data_in_leaf: 57
-    max_bin: 494
-    eval_metric: MultiClass
-    loss_function: MultiClass
-    od_type: Iter
-    od_wait: 500
-    iterations: 10000
-  path: models/5fold_catboost_models.pkl
+    reg_alpha: 5.998770177220496e-05
+    reg_lambda: 0.07127674208132959
+    max_depth: 18
+    num_leaves: 125
+    colsample_bytree: 0.4241631237880101
+    subsample: 0.8876057928391585
+    subsample_freq: 5
+    min_child_samples: 5
+    max_bin: 449
+    boosting_type: gbdt
+    learning_rate: 0.05
+    n_estimators: 10000
+    objective: multiclass
+  path: models/10fold_lightgbm_models.pkl
+  metric: multi_logloss
   early_stopping_rounds: 100
+  search: False
   seed: 42
   verbose: 100
+output:
+  name: 10fold_lightgbm.csv
+  path: output

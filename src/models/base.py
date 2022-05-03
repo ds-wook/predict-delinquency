@@ -51,6 +51,22 @@ class BaseModel(metaclass=ABCMeta):
         with open(model_path, "wb") as output:
             pickle.dump(self.result, output, pickle.HIGHEST_PROTOCOL)
 
+    @staticmethod
+    def load_model(model_name: str) -> ModelResult:
+        """
+        Load model
+        Args:
+            model_name: model name
+        Returns:
+            ModelResult object
+        """
+        model_path = Path(get_original_cwd()) / model_name
+
+        with open(model_path, "rb") as output:
+            model_result = pickle.load(output)
+
+        return model_result
+
     def train(self, train_x: pd.DataFrame, train_y: pd.Series) -> ModelResult:
         """
         Train data

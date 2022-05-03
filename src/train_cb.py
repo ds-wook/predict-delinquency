@@ -9,7 +9,7 @@ from inference.infer import load_model, predict
 from models.boosting import CatBoostTrainer
 
 
-@hydra.main(config_path="../config/modeling/", config_name="cb.yaml")
+@hydra.main(config_path="../config/training/", config_name="cb.yaml")
 def _main(cfg: DictConfig):
     train, test = load_dataset(cfg)
     train = category_income(train)

@@ -7,6 +7,27 @@ dataset:
   target: credit
   train: train.csv
   test: test.csv
+  is_catboost: False
+  cat_features:
+  - income_total
+  - income_type
+  - edu_type
+  - family_type
+  - house_type
+  - FLAG_MOBIL
+  - work_phone
+  - phone
+  - occyp_type
+  - begin_month
+  - DAYS_BIRTH_month
+  - DAYS_BIRTH_week
+  - Age
+  - DAYS_EMPLOYED_month
+  - DAYS_EMPLOYED_week
+  - before_EMPLOYED
+  - before_EMPLOYED_month
+  - before_EMPLOYED_week
+  - user_code
 experiment:
   project: ds-wook/cdal
   tags:

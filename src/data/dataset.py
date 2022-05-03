@@ -122,6 +122,7 @@ def load_dataset(config: DictConfig) -> Tuple[DataFrame, DataFrame]:
         "DAYS_BIRTH",
         "DAYS_EMPLOYED",
     ]
+
     train.drop(train.loc[train["family_size"] > 7, "family_size"].index, inplace=True)
     train.drop(del_cols, axis=1, inplace=True)
     test.drop(del_cols, axis=1, inplace=True)
