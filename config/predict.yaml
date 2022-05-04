@@ -28,10 +28,11 @@ dataset:
   - before_EMPLOYED_month
   - before_EMPLOYED_week
   - user_code
+  submit: sample_submission.csv
 model:
-  catboost: res/models/10fold_catboost_models.pkl
-  lightgbm: res/models/10fold_lightgbm_models.pkl
-  xgboost: res/models/10fold_xgboost_models.pkl
+  catboost: build/model/10fold_catboost_models.pkl
+  lightgbm: build/model/10fold_lightgbm_models.pkl
+  xgboost: build/model/10fold_xgboost_models.pkl
 output:
   path: output
-  name: ...
+  name: build/output/10fold_lightgbm.csv

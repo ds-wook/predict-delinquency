@@ -4,14 +4,13 @@ from omegaconf import DictConfig
 from sklearn.metrics import log_loss
 
 from data.dataset import load_dataset
-from features.build import category_income, kfold_mean_encoding
 from models.boosting import LightGBMTrainer
 
 
 @hydra.main(config_path="../config/training/", config_name="lgb.yaml")
 def _main(cfg: DictConfig):
     train, test = load_dataset(cfg)
-    train = category_income(train)
+
     train_x = train.drop(columns=cfg.dataset.target)
     train_y = train[cfg.dataset.target]
 
