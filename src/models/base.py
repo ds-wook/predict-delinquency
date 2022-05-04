@@ -3,8 +3,9 @@ import logging
 import pickle
 import warnings
 from abc import ABCMeta, abstractclassmethod
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, NamedTuple
+from typing import Any, Callable, Dict
 
 import numpy as np
 import pandas as pd
@@ -15,7 +16,8 @@ from sklearn.model_selection import StratifiedKFold
 warnings.filterwarnings("ignore")
 
 
-class ModelResult(NamedTuple):
+@dataclass
+class ModelResult:
     oof_preds: np.ndarray
     models: Dict[str, Any]
     scores: Dict[str, float]
