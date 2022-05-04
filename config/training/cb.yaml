@@ -46,7 +46,7 @@ model:
     od_type: Iter
     od_wait: 500
     iterations: 10000
-  path: models/5fold_catboost_models.pkl
+  path: build/model/5fold_catboost_models.pkl
   early_stopping_rounds: 100
   seed: 42
   verbose: 100

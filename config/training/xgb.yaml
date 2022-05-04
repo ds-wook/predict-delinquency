@@ -46,7 +46,7 @@ model:
     reg_alpha: 0.3916028672163949
     reg_lambda: 0.8398892426801621
     subsample: 0.8708229999183839
-  path: models/5fold_xgboost_models.pkl
+  path: build/model/5fold_xgboost_models.pkl
   metric: auc
   early_stopping_rounds: 100
   seed: 42

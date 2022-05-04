@@ -48,7 +48,7 @@ model:
     learning_rate: 0.05
     n_estimators: 10000
     objective: multiclass
-  path: models/10fold_lightgbm_models.pkl
+  path: build/model/10fold_lightgbm_models.pkl
   metric: multi_logloss
   early_stopping_rounds: 100
   search: False

@@ -1,4 +1,5 @@
 import warnings
+from typing import Optional
 
 import neptune.new.integrations.lightgbm as nep_lgbm_utils
 import neptune.new.integrations.xgboost as nep_xgb_utils
@@ -14,7 +15,7 @@ warnings.filterwarnings("ignore")
 
 
 class LightGBMTrainer(BaseModel):
-    def __init__(self, run: Run, **kwargs):
+    def __init__(self, run: Optional[Run] = None, **kwargs):
         super().__init__(**kwargs)
         self.run = run
 
@@ -62,7 +63,7 @@ class LightGBMTrainer(BaseModel):
 
 
 class CatBoostTrainer(BaseModel):
-    def __init__(self, run: Run, **kwargs):
+    def __init__(self, run: Optional[Run] = None, **kwargs):
         super().__init__(**kwargs)
         self.run = run
 
@@ -103,7 +104,7 @@ class CatBoostTrainer(BaseModel):
 
 
 class XGBoostTrainer(BaseModel):
-    def __init__(self, run: Run, **kwargs):
+    def __init__(self, run: Optional[Run] = None, **kwargs):
         super().__init__(**kwargs)
         self.run = run
 
