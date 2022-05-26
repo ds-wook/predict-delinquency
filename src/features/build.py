@@ -4,7 +4,29 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
+
+
+def categorical_encoding(
+    train: DataFrame, test: DataFrame, cat_cols: List[str]
+) -> Tuple[DataFrame, DataFrame]:
+    """
+    Catboost encoding
+
+    Args:
+        train: train data
+        test: test data
+    Returns:
+        dataframe of tuple
+    """
+    for col in tqdm(cat_cols):
+        label_encoder = LabelEncoder()
+        label_encoder = label_encoder.fit(train[col])
+        train[col] = label_encoder.transform(train[col])
+        test[col] = label_encoder.transform(test[col])
+
+    return train, test
 
 
 def category_income(data: DataFrame) -> DataFrame:

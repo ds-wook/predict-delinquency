@@ -29,7 +29,9 @@ dataset:
   - before_EMPLOYED_week
   - user_code
 experiment:
-  project: ds-wook/cdal
+  project: cdal
+  entity: ds-wook
+  name: lightgbm_3
   tags:
   - LightGBM
 model:

@@ -6,9 +6,11 @@ from abc import ABCMeta, abstractclassmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
+from gevent import reinit
 
 import numpy as np
 import pandas as pd
+import wandb
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
 from sklearn.model_selection import StratifiedKFold
@@ -37,7 +39,6 @@ class BaseModel(metaclass=ABCMeta):
         y_train: pd.Series,
         X_valid: pd.DataFrame,
         y_valid: pd.Series,
-        fold: int,
     ):
         """
         Trains the model.
@@ -90,14 +91,18 @@ class BaseModel(metaclass=ABCMeta):
             # split train and validation data
             X_train, y_train = train_x.iloc[train_idx], train_y.iloc[train_idx]
             X_valid, y_valid = train_x.iloc[valid_idx], train_y.iloc[valid_idx]
-
+            wandb.init(
+                entity=self.config.experiment.entity,
+                project=self.config.experiment.project,
+                name=self.config.experiment.name + f"_fold_{fold}",
+                reinit=True,
+            )
             # model
             model = self._train(
                 X_train,
                 y_train,
                 X_valid,
                 y_valid,
-                fold=fold,
             )
             models[f"fold_{fold}"] = model
 
@@ -112,6 +117,8 @@ class BaseModel(metaclass=ABCMeta):
             gc.collect()
 
             del X_train, X_valid, y_train, y_valid
+            # Close run for that fold
+            wandb.join()
 
         oof_score = self.metric(train_y.to_numpy(), oof_preds)
         logging.info(f"OOF Score: {oof_score}")

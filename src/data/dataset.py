@@ -7,8 +7,8 @@ import pandas as pd
 from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
 from pandas import DataFrame
-from sklearn.preprocessing import LabelEncoder
-from tqdm import tqdm
+
+from features.build import categorical_encoding
 
 warnings.filterwarnings("ignore")
 
@@ -136,10 +136,6 @@ def load_dataset(config: DictConfig) -> Tuple[DataFrame, DataFrame]:
         "user_code",
     ]
 
-    for col in tqdm(cat_cols):
-        label_encoder = LabelEncoder()
-        label_encoder = label_encoder.fit(train[col])
-        train[col] = label_encoder.transform(train[col])
-        test[col] = label_encoder.transform(test[col])
+    train, test = categorical_encoding(train, test, cat_cols)
 
     return train, test

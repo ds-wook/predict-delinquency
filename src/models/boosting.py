@@ -1,9 +1,11 @@
 import warnings
 from typing import Optional
 
-import neptune.new.integrations.lightgbm as nep_lgbm_utils
-import neptune.new.integrations.xgboost as nep_xgb_utils
 import pandas as pd
+import wandb.catboost as wandb_cb
+import wandb.lightgbm as wandb_lgb
+import wandb.xgboost as wandb_xgb
+
 from catboost import CatBoostClassifier, Pool
 from lightgbm import LGBMClassifier
 from neptune.new import Run
@@ -15,9 +17,8 @@ warnings.filterwarnings("ignore")
 
 
 class LightGBMTrainer(BaseModel):
-    def __init__(self, run: Optional[Run] = None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.run = run
 
     def _train(
         self,
@@ -25,16 +26,10 @@ class LightGBMTrainer(BaseModel):
         y_train: pd.Series,
         X_valid: pd.DataFrame,
         y_valid: pd.Series,
-        fold: int,
     ) -> LGBMClassifier:
         """
         load train model
         """
-        neptune_callback = (
-            nep_lgbm_utils.NeptuneCallback(run=self.run, base_namespace=f"fold_{fold}")
-            if not self.config.model.search
-            else self.run
-        )
 
         model = LGBMClassifier(
             random_state=self.config.model.seed, **self.config.model.params
@@ -47,25 +42,15 @@ class LightGBMTrainer(BaseModel):
             eval_metric=self.config.model.metric,
             early_stopping_rounds=self.config.model.early_stopping_rounds,
             verbose=self.config.model.verbose,
-            callbacks=[neptune_callback],
+            callbacks=[wandb_lgb.wandb_callback()],
         )
-
-        if not self.config.model.search:
-            # Log summary metadata to the same run under the "lgbm_summary" namespace
-            self.run[f"summary/{fold}"] = nep_lgbm_utils.create_booster_summary(
-                booster=model,
-                log_pickled_booster=False,
-                y_pred=model.predict(X_valid),
-                y_true=y_valid,
-            )
 
         return model
 
 
 class CatBoostTrainer(BaseModel):
-    def __init__(self, run: Optional[Run] = None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.run = run
 
     def _train(
         self,
@@ -73,7 +58,6 @@ class CatBoostTrainer(BaseModel):
         y_train: pd.Series,
         X_valid: pd.DataFrame,
         y_valid: pd.Series,
-        fold: int,
     ) -> CatBoostClassifier:
         """
         load train model
@@ -96,9 +80,8 @@ class CatBoostTrainer(BaseModel):
             early_stopping_rounds=self.config.model.early_stopping_rounds,
             verbose=self.config.model.verbose,
         )
-        if self.config.model.search:
-            self.run[f"catboost/fold_{fold}/best_iteration"] = model.best_iteration_
-            self.run[f"catboost/fold_{fold}/best_score"] = model.best_score_
+
+        wandb_cb.log_summary(model)
 
         return model
 
@@ -114,22 +97,10 @@ class XGBoostTrainer(BaseModel):
         y_train: pd.Series,
         X_valid: pd.DataFrame,
         y_valid: pd.Series,
-        fold: int,
     ) -> XGBClassifier:
         """
         load train model
         """
-        neptune_callback = (
-            nep_xgb_utils.NeptuneCallback(
-                run=self.run,
-                base_namespace=f"fold_{fold}",
-                log_tree=[0, 1, 2, 3],
-                max_num_features=10,
-            )
-            if not self.config.model.search
-            else self.run
-        )
-
         model = XGBClassifier(
             random_state=self.config.model.seed, **self.config.model.params
         )
@@ -140,7 +111,7 @@ class XGBoostTrainer(BaseModel):
             eval_metric=self.config.model.metric,
             early_stopping_rounds=self.config.model.early_stopping_rounds,
             verbose=self.config.model.verbose,
-            callbacks=[neptune_callback],
+            callbacks=[wandb_xgb.wandb_callback()],
         )
 
         return model

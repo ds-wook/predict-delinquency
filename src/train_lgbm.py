@@ -1,5 +1,4 @@
 import hydra
-import neptune.new as neptune
 from omegaconf import DictConfig
 from sklearn.metrics import log_loss
 
@@ -14,16 +13,7 @@ def _main(cfg: DictConfig):
     train_x = train.drop(columns=cfg.dataset.target)
     train_y = train[cfg.dataset.target]
 
-    # train_x, test_x = kfold_mean_encoding(
-    #     train_x, test_x, train_y, cfg.dataset.cat_features
-    # )
-    run = neptune.init(
-        project=cfg.experiment.project,
-        tags=[*cfg.experiment.tags],
-        capture_hardware_metrics=False,
-    )
-
-    lgb_trainer = LightGBMTrainer(config=cfg, run=run, metric=log_loss)
+    lgb_trainer = LightGBMTrainer(config=cfg, metric=log_loss)
     lgb_trainer.train(train_x, train_y)
     lgb_trainer.save_model()
 
