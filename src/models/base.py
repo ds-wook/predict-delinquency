@@ -6,7 +6,6 @@ from abc import ABCMeta, abstractclassmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
-from gevent import reinit
 
 import numpy as np
 import pandas as pd
@@ -117,6 +116,7 @@ class BaseModel(metaclass=ABCMeta):
             gc.collect()
 
             del X_train, X_valid, y_train, y_valid
+
             # Close run for that fold
             wandb.join()
 

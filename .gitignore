@@ -135,3 +135,4 @@ output/*
 !output/.gitkeep
 log/*
 models/*
+res/*
