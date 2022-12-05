@@ -90,12 +90,7 @@ class BaseModel(metaclass=ABCMeta):
             # split train and validation data
             X_train, y_train = train_x.iloc[train_idx], train_y.iloc[train_idx]
             X_valid, y_valid = train_x.iloc[valid_idx], train_y.iloc[valid_idx]
-            wandb.init(
-                entity=self.config.experiment.entity,
-                project=self.config.experiment.project,
-                name=self.config.experiment.name + f"_fold_{fold}",
-                reinit=True,
-            )
+
             # model
             model = self._train(
                 X_train,
@@ -116,9 +111,6 @@ class BaseModel(metaclass=ABCMeta):
             gc.collect()
 
             del X_train, X_valid, y_train, y_valid
-
-            # Close run for that fold
-            wandb.join()
 
         oof_score = self.metric(train_y.to_numpy(), oof_preds)
         logging.info(f"OOF Score: {oof_score}")

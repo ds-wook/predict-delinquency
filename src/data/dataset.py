@@ -8,7 +8,7 @@ from hydra.utils import get_original_cwd
 from omegaconf import DictConfig
 from pandas import DataFrame
 
-from features.build import categorical_encoding
+from features.engine import categorical_encoding
 
 warnings.filterwarnings("ignore")
 
